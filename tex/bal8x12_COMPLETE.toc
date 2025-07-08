@@ -1,0 +1,8 @@
+\contentsline {section}{\numberline {1}模型概览}{2}{}%
+\contentsline {section}{\numberline {2}目标函数}{2}{}%
+\contentsline {section}{\numberline {3}约束条件}{4}{}%
+\contentsline {subsection}{\numberline {3.1}等式约束 (20个)}{4}{}%
+\contentsline {subsection}{\numberline {3.2}不等式约束 (96个)}{5}{}%
+\contentsline {section}{\numberline {4}变量定义}{7}{}%
+\contentsline {subsection}{\numberline {4.1}二元变量 (96个)}{7}{}%
+\contentsline {subsection}{\numberline {4.2}连续变量 (96个)}{7}{}%

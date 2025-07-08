@@ -1,0 +1,10 @@
+[2025-07-08 23:49:09] ====== 批量求解开始 ======
+[2025-07-08 23:49:09] ✅ bk4x3.mps 求解成功 | ⏱ 0.11s | 输出: bk4x3_solutions.xlsx
+[2025-07-08 23:49:44] ✅ ran12x21.mps 求解成功 | ⏱ 34.17s | 输出: ran12x21_solutions.xlsx
+[2025-07-08 23:49:44] ✅ ran6x43.mps 求解成功 | ⏱ 0.28s | 输出: ran6x43_solutions.xlsx
+[2025-07-08 23:50:01] ✅ ran10x26.mps 求解成功 | ⏱ 16.94s | 输出: ran10x26_solutions.xlsx
+[2025-07-08 23:50:01] ✅ bal8x12.mps 求解成功 | ⏱ 0.03s | 输出: bal8x12_solutions.xlsx
+[2025-07-08 23:50:06] ✅ ran17x17.mps 求解成功 | ⏱ 4.75s | 输出: ran17x17_solutions.xlsx
+[2025-07-08 23:50:09] ✅ ran8x32.mps 求解成功 | ⏱ 3.61s | 输出: ran8x32_solutions.xlsx
+[2025-07-08 23:50:09] ✅ gr4x6.mps 求解成功 | ⏱ 0.01s | 输出: gr4x6_solutions.xlsx
+[2025-07-08 23:58:58] ✅ ran14x18.mps 求解成功 | ⏱ 528.64s | 输出: ran14x18_solutions.xlsx

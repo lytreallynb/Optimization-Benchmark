@@ -1,0 +1,153 @@
+
+\documentclass[a4paper,10pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage{geometry}
+\geometry{a4paper, left=1.5cm, right=1.5cm, top=2cm, bottom=2cm}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{MPS文件数学模型 - 完整版}
+\fancyfoot[C]{\thepage}
+
+% 允许数学环境跨页
+\allowdisplaybreaks[4]
+% 减小数学环境的间距
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+
+\title{MPS文件数学模型提取\\{\large 完整版}}
+\author{MPS Extractor}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{模型概览}
+
+\textbf{文件名:} \texttt{gr4x6.mps} \\
+\textbf{模型名:} name \\
+\textbf{变量总数:} 48 \\
+\textbf{约束总数:} 34 \\
+\textbf{优化方向:} Minimize \\
+
+\section{目标函数}
+
+\textbf{目标函数摘要:}
+\begin{equation}
+\min \quad Z = \sum_{i} c_i Y_i + \sum_{j} d_j X_j
+\end{equation}
+
+Y变量: 24个，系数范围 [10, 20] \\
+X变量: 24个，系数范围 [0.59, 2.83]
+
+\textbf{完整目标函数:}
+
+\allowdisplaybreaks
+{\small
+\begin{align}
+\min \quad Z = &\; 15 Y_{22} + 11 Y_{0} + 16 Y_{1} \\[0.3ex]
+&\;  + 18 Y_{2} + 17 Y_{3} + 10 Y_{4} \\[0.3ex]
+&\;  + 20 Y_{5} + 14 Y_{6} + 17 Y_{7} \\[0.3ex]
+&\;  + 17 Y_{8} + 13 Y_{9} + 15 Y_{10} \\[0.3ex]
+&\;  + 13 Y_{11} + 12 Y_{12} + 13 Y_{13} \\[0.3ex]
+&\;  + 20 Y_{14} + 17 Y_{15} + 13 Y_{16} \\[0.3ex]
+&\;  + 15 Y_{17} + 16 Y_{18} + 19 Y_{19} \\[0.3ex]
+&\;  + 15 Y_{20} + 11 Y_{21} + 12 Y_{23} \\[0.3ex]
+&\;  + 0.69 X_{0} + 0.64 X_{1} + 0.71 X_{2} \\[0.3ex]
+&\;  + 0.79 X_{3} + 1.7 X_{4} + 2.83 X_{5} \\[0.5ex]\allowbreak
+&\;  + 1.01 X_{6} + 0.75 X_{7} + 0.88 X_{8} \\[0.3ex]
+&\;  + 0.59 X_{9} + 1.5 X_{10} + 2.63 X_{11} \\[0.3ex]
+&\;  + 1.05 X_{12} + 1.06 X_{13} + 1.08 X_{14} \\[0.3ex]
+&\;  + 0.64 X_{15} + 1.22 X_{16} + 2.37 X_{17} \\[0.3ex]
+&\;  + 1.94 X_{18} + 1.5 X_{19} + 1.56 X_{20} \\[0.3ex]
+&\;  + 1.22 X_{21} + 1.98 X_{22} + 1.98 X_{23}\nonumber
+\end{align}
+}
+
+\section{约束条件}
+
+\subsection{等式约束 (10个)}
+
+\allowdisplaybreaks
+{\small
+\begin{align}
+X_{0} + X_{1} + X_{2} + X_{3} + X_{4} + X_{5} &= +45 && \text{(A0)} \\
+X_{6} + X_{7} + X_{8} + X_{9} + X_{10} + X_{11} &= +35 && \text{(A1)} \\
+X_{12} + X_{13} + X_{14} + X_{15} + X_{16} + X_{17} &= +20 && \text{(A2)} \\
+X_{18} + X_{19} + X_{20} + X_{21} + X_{22} + X_{23} &= +15 && \text{(A3)} \\
+X_{0} + X_{6} + X_{12} + X_{18} &= +35 && \text{(B0)} \\
+\allowbreak
+X_{1} + X_{7} + X_{13} + X_{19} &= +30 && \text{(B1)} \\
+X_{2} + X_{8} + X_{14} + X_{20} &= +25 && \text{(B2)} \\
+X_{3} + X_{9} + X_{15} + X_{21} &= +15 && \text{(B3)} \\
+X_{4} + X_{10} + X_{16} + X_{22} &= +5 && \text{(B4)} \\
+X_{5} + X_{11} + X_{17} + X_{23} &= +5 && \text{(B5)} \\
+\end{align}
+}
+
+\subsection{不等式约束 (24个)}
+
+\allowdisplaybreaks
+{\small
+\begin{align}
+X_{0} - 35Y_{0} &\leq +0 && \text{(G0)} \\
+X_{1} - 30Y_{1} &\leq +0 && \text{(G1)} \\
+X_{2} - 25Y_{2} &\leq +0 && \text{(G2)} \\
+X_{3} - 15Y_{3} &\leq +0 && \text{(G3)} \\
+X_{4} - 5Y_{4} &\leq +0 && \text{(G4)} \\
+X_{5} - 5Y_{5} &\leq +0 && \text{(G5)} \\
+X_{6} - 35Y_{6} &\leq +0 && \text{(G6)} \\
+X_{7} - 30Y_{7} &\leq +0 && \text{(G7)} \\
+X_{8} - 25Y_{8} &\leq +0 && \text{(G8)} \\
+X_{9} - 15Y_{9} &\leq +0 && \text{(G9)} \\
+\allowbreak
+X_{10} - 5Y_{10} &\leq +0 && \text{(G10)} \\
+X_{11} - 5Y_{11} &\leq +0 && \text{(G11)} \\
+X_{12} - 20Y_{12} &\leq +0 && \text{(G12)} \\
+X_{13} - 20Y_{13} &\leq +0 && \text{(G13)} \\
+X_{14} - 20Y_{14} &\leq +0 && \text{(G14)} \\
+X_{15} - 15Y_{15} &\leq +0 && \text{(G15)} \\
+X_{16} - 5Y_{16} &\leq +0 && \text{(G16)} \\
+X_{17} - 5Y_{17} &\leq +0 && \text{(G17)} \\
+X_{18} - 15Y_{18} &\leq +0 && \text{(G18)} \\
+X_{19} - 15Y_{19} &\leq +0 && \text{(G19)} \\
+\allowbreak
+X_{20} - 15Y_{20} &\leq +0 && \text{(G20)} \\
+X_{21} - 15Y_{21} &\leq +0 && \text{(G21)} \\
+X_{22} - 5Y_{22} &\leq +0 && \text{(G22)} \\
+X_{23} - 5Y_{23} &\leq +0 && \text{(G23)} \\
+\end{align}
+}
+
+\section{变量定义}
+
+\subsection{二元变量 (24个)}
+
+\begin{equation}
+Y_i \in \{0,1\}, \quad i \in \{0, 1, 2, \ldots, 23\}
+\end{equation}
+
+\textbf{所有二元变量:}
+
+{\small
+$Y_{22}$, $Y_{0}$, $Y_{1}$, $Y_{2}$, $Y_{3}$, $Y_{4}$, $Y_{5}$, $Y_{6}$, $Y_{7}$, $Y_{8}$, \\
+$Y_{9}$, $Y_{10}$, $Y_{11}$, $Y_{12}$, $Y_{13}$, $Y_{14}$, $Y_{15}$, $Y_{16}$, $Y_{17}$, $Y_{18}$, \\
+$Y_{19}$, $Y_{20}$, $Y_{21}$, $Y_{23}$
+}
+
+\subsection{连续变量 (24个)}
+
+所有连续变量均为非负实数:
+\begin{equation}
+X_j \geq 0, \quad j \in \{0, 1, 2, \ldots, 23\}
+\end{equation}
+
+\textbf{连续变量说明:} 模型包含24个连续决策变量，所有变量的取值范围均为非负实数域。
+
+\end{document}
