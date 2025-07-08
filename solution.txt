@@ -1,0 +1,316 @@
+Columns
+    Index Status        Lower        Upper       Primal         Dual  Type        Name
+        0                   0          inf  2.13163e-14               Continuous  X0
+        1                   0          inf           15               Continuous  X1
+        2                   0          inf            0               Continuous  X2
+        3                   0          inf            0               Continuous  X3
+        4                   0          inf           -0               Continuous  X4
+        5                   0          inf            0               Continuous  X5
+        6                   0          inf            0               Continuous  X6
+        7                   0          inf            0               Continuous  X7
+        8                   0          inf            0               Continuous  X8
+        9                   0          inf            0               Continuous  X9
+       10                   0          inf            0               Continuous  X10
+       11                   0          inf            0               Continuous  X11
+       12                   0          inf           -0               Continuous  X12
+       13                   0          inf           -0               Continuous  X13
+       14                   0          inf           20               Continuous  X14
+       15                   0          inf  1.59872e-14               Continuous  X15
+       16                   0          inf            0               Continuous  X16
+       17                   0          inf            0               Continuous  X17
+       18                   0          inf            0               Continuous  X18
+       19                   0          inf            0               Continuous  X19
+       20                   0          inf            0               Continuous  X20
+       21                   0          inf            0               Continuous  X21
+       22                   0          inf            0               Continuous  X22
+       23                   0          inf            0               Continuous  X23
+       24                   0          inf           20               Continuous  X24
+       25                   0          inf           -0               Continuous  X25
+       26                   0          inf            0               Continuous  X26
+       27                   0          inf  1.37434e-14               Continuous  X27
+       28                   0          inf            5               Continuous  X28
+       29                   0          inf           20               Continuous  X29
+       30                   0          inf            0               Continuous  X30
+       31                   0          inf            0               Continuous  X31
+       32                   0          inf            0               Continuous  X32
+       33                   0          inf            0               Continuous  X33
+       34                   0          inf            0               Continuous  X34
+       35                   0          inf            0               Continuous  X35
+       36                   0          inf            0               Continuous  X36
+       37                   0          inf            0               Continuous  X37
+       38                   0          inf            0               Continuous  X38
+       39                   0          inf           -0               Continuous  X39
+       40                   0          inf            0               Continuous  X40
+       41                   0          inf  1.42109e-14               Continuous  X41
+       42                   0          inf           30               Continuous  X42
+       43                   0          inf            0               Continuous  X43
+       44                   0          inf            0               Continuous  X44
+       45                   0          inf            0               Continuous  X45
+       46                   0          inf            0               Continuous  X46
+       47                   0          inf            5               Continuous  X47
+       48                   0          inf            0               Continuous  X48
+       49                   0          inf            0               Continuous  X49
+       50                   0          inf  2.13163e-14               Continuous  X50
+       51                   0          inf           15               Continuous  X51
+       52                   0          inf           -0               Continuous  X52
+       53                   0          inf            0               Continuous  X53
+       54                   0          inf           -0               Continuous  X54
+       55                   0          inf -1.73195e-14               Continuous  X55
+       56                   0          inf           -0               Continuous  X56
+       57                   0          inf           -0               Continuous  X57
+       58                   0          inf           10               Continuous  X58
+       59                   0          inf           -0               Continuous  X59
+       60                   0          inf            0               Continuous  X60
+       61                   0          inf            0               Continuous  X61
+       62                   0          inf            0               Continuous  X62
+       63                   0          inf            0               Continuous  X63
+       64                   0          inf            0               Continuous  X64
+       65                   0          inf            0               Continuous  X65
+       66                   0          inf            0               Continuous  X66
+       67                   0          inf           -0               Continuous  X67
+       68                   0          inf           35               Continuous  X68
+       69                   0          inf           -0               Continuous  X69
+       70                   0          inf            0               Continuous  X70
+       71                   0          inf            0               Continuous  X71
+       72                   0          inf            0               Continuous  X72
+       73                   0          inf            0               Continuous  X73
+       74                   0          inf            0               Continuous  X74
+       75                   0          inf            0               Continuous  X75
+       76                   0          inf            0               Continuous  X76
+       77                   0          inf            0               Continuous  X77
+       78                   0          inf            0               Continuous  X78
+       79                   0          inf           10               Continuous  X79
+       80                   0          inf            0               Continuous  X80
+       81                   0          inf            0               Continuous  X81
+       82                   0          inf -1.77636e-14               Continuous  X82
+       83                   0          inf            0               Continuous  X83
+       84                   0          inf            0               Continuous  X84
+       85                   0          inf            0               Continuous  X85
+       86                   0          inf            0               Continuous  X86
+       87                   0          inf            0               Continuous  X87
+       88                   0          inf            0               Continuous  X88
+       89                   0          inf            0               Continuous  X89
+       90                   0          inf            0               Continuous  X90
+       91                   0          inf            0               Continuous  X91
+       92                   0          inf           -0               Continuous  X92
+       93                   0          inf           25               Continuous  X93
+       94                   0          inf           -0               Continuous  X94
+       95                   0          inf            0               Continuous  X95
+       96                   0            1  1.42109e-15               Integer     Y0
+       97                   0            1            1               Integer     Y1
+       98                   0            1           -0               Integer     Y2
+       99                   0            1            0               Integer     Y3
+      100                   0            1           -0               Integer     Y4
+      101                   0            1            0               Integer     Y5
+      102                   0            1            0               Integer     Y6
+      103                   0            1            0               Integer     Y7
+      104                   0            1            0               Integer     Y8
+      105                   0            1            0               Integer     Y9
+      106                   0            1            0               Integer     Y10
+      107                   0            1            0               Integer     Y11
+      108                   0            1  1.11022e-15               Integer     Y12
+      109                   0            1           -0               Integer     Y13
+      110                   0            1            1               Integer     Y14
+      111                   0            1  1.06581e-15               Integer     Y15
+      112                   0            1           -0               Integer     Y16
+      113                   0            1           -0               Integer     Y17
+      114                   0            1            0               Integer     Y18
+      115                   0            1            0               Integer     Y19
+      116                   0            1            0               Integer     Y20
+      117                   0            1            0               Integer     Y21
+      118                   0            1            0               Integer     Y22
+      119                   0            1           -0               Integer     Y23
+      120                   0            1            1               Integer     Y24
+      121                   0            1           -0               Integer     Y25
+      122                   0            1           -0               Integer     Y26
+      123                   0            1  9.16226e-16               Integer     Y27
+      124                   0            1            1               Integer     Y28
+      125                   0            1            1               Integer     Y29
+      126                   0            1           -0               Integer     Y30
+      127                   0            1            0               Integer     Y31
+      128                   0            1            0               Integer     Y32
+      129                   0            1            0               Integer     Y33
+      130                   0            1           -0               Integer     Y34
+      131                   0            1            0               Integer     Y35
+      132                   0            1            0               Integer     Y36
+      133                   0            1            0               Integer     Y37
+      134                   0            1           -0               Integer     Y38
+      135                   0            1           -0               Integer     Y39
+      136                   0            1            0               Integer     Y40
+      137                   0            1  7.10543e-16               Integer     Y41
+      138                   0            1            1               Integer     Y42
+      139                   0            1            0               Integer     Y43
+      140                   0            1            0               Integer     Y44
+      141                   0            1            0               Integer     Y45
+      142                   0            1            0               Integer     Y46
+      143                   0            1            1               Integer     Y47
+      144                   0            1            0               Integer     Y48
+      145                   0            1           -0               Integer     Y49
+      146                   0            1  1.06581e-15               Integer     Y50
+      147                   0            1            1               Integer     Y51
+      148                   0            1           -0               Integer     Y52
+      149                   0            1           -0               Integer     Y53
+      150                   0            1           -0               Integer     Y54
+      151                   0            1 -1.73195e-15               Integer     Y55
+      152                   0            1           -0               Integer     Y56
+      153                   0            1           -0               Integer     Y57
+      154                   0            1            1               Integer     Y58
+      155                   0            1           -0               Integer     Y59
+      156                   0            1            0               Integer     Y60
+      157                   0            1            0               Integer     Y61
+      158                   0            1            0               Integer     Y62
+      159                   0            1            0               Integer     Y63
+      160                   0            1            0               Integer     Y64
+      161                   0            1            0               Integer     Y65
+      162                   0            1            0               Integer     Y66
+      163                   0            1           -0               Integer     Y67
+      164                   0            1            1               Integer     Y68
+      165                   0            1           -0               Integer     Y69
+      166                   0            1           -0               Integer     Y70
+      167                   0            1            0               Integer     Y71
+      168                   0            1            0               Integer     Y72
+      169                   0            1            0               Integer     Y73
+      170                   0            1            0               Integer     Y74
+      171                   0            1            0               Integer     Y75
+      172                   0            1            0               Integer     Y76
+      173                   0            1            0               Integer     Y77
+      174                   0            1            0               Integer     Y78
+      175                   0            1            1               Integer     Y79
+      176                   0            1            0               Integer     Y80
+      177                   0            1            0               Integer     Y81
+      178                   0            1 -1.77636e-15               Integer     Y82
+      179                   0            1           -0               Integer     Y83
+      180                   0            1            0               Integer     Y84
+      181                   0            1           -0               Integer     Y85
+      182                   0            1            0               Integer     Y86
+      183                   0            1            0               Integer     Y87
+      184                   0            1            0               Integer     Y88
+      185                   0            1            0               Integer     Y89
+      186                   0            1            0               Integer     Y90
+      187                   0            1           -0               Integer     Y91
+      188                   0            1           -0               Integer     Y92
+      189                   0            1            1               Integer     Y93
+      190                   0            1           -0               Integer     Y94
+      191                   0            1           -0               Integer     Y95
+Rows
+    Index Status        Lower        Upper       Primal         Dual  Name
+        0                  15           15           15               A0
+        1                  20           20           20               A1
+        2                  45           45           45               A2
+        3                  35           35           35               A3
+        4                  25           25           25               A4
+        5                  35           35           35               A5
+        6                  10           10           10               A6
+        7                  25           25           25               A7
+        8                  20           20           20               B0
+        9                  15           15           15               B1
+       10                  20           20           20               B2
+       11                  15           15           15               B3
+       12                   5            5            5               B4
+       13                  20           20           20               B5
+       14                  30           30           30               B6
+       15                  10           10           10               B7
+       16                  35           35           35               B8
+       17                  25           25           25               B9
+       18                  10           10           10               B10
+       19                   5            5            5               B11
+       20                -inf            0            0               G0
+       21                -inf            0            0               G1
+       22                -inf            0            0               G2
+       23                -inf            0            0               G3
+       24                -inf            0            0               G4
+       25                -inf            0            0               G5
+       26                -inf            0            0               G6
+       27                -inf            0            0               G7
+       28                -inf            0            0               G8
+       29                -inf            0            0               G9
+       30                -inf            0            0               G10
+       31                -inf            0            0               G11
+       32                -inf            0 -2.22045e-14               G12
+       33                -inf            0            0               G13
+       34                -inf            0            0               G14
+       35                -inf            0            0               G15
+       36                -inf            0            0               G16
+       37                -inf            0            0               G17
+       38                -inf            0            0               G18
+       39                -inf            0            0               G19
+       40                -inf            0            0               G20
+       41                -inf            0            0               G21
+       42                -inf            0            0               G22
+       43                -inf            0            0               G23
+       44                -inf            0            0               G24
+       45                -inf            0            0               G25
+       46                -inf            0            0               G26
+       47                -inf            0            0               G27
+       48                -inf            0            0               G28
+       49                -inf            0            0               G29
+       50                -inf            0            0               G30
+       51                -inf            0            0               G31
+       52                -inf            0            0               G32
+       53                -inf            0            0               G33
+       54                -inf            0            0               G34
+       55                -inf            0            0               G35
+       56                -inf            0            0               G36
+       57                -inf            0            0               G37
+       58                -inf            0            0               G38
+       59                -inf            0            0               G39
+       60                -inf            0            0               G40
+       61                -inf            0            0               G41
+       62                -inf            0 -1.06581e-14               G42
+       63                -inf            0            0               G43
+       64                -inf            0            0               G44
+       65                -inf            0            0               G45
+       66                -inf            0            0               G46
+       67                -inf            0            0               G47
+       68                -inf            0            0               G48
+       69                -inf            0            0               G49
+       70                -inf            0            0               G50
+       71                -inf            0 -4.08562e-14               G51
+       72                -inf            0            0               G52
+       73                -inf            0            0               G53
+       74                -inf            0            0               G54
+       75                -inf            0            0               G55
+       76                -inf            0            0               G56
+       77                -inf            0            0               G57
+       78                -inf            0            0               G58
+       79                -inf            0            0               G59
+       80                -inf            0            0               G60
+       81                -inf            0            0               G61
+       82                -inf            0            0               G62
+       83                -inf            0            0               G63
+       84                -inf            0            0               G64
+       85                -inf            0            0               G65
+       86                -inf            0            0               G66
+       87                -inf            0            0               G67
+       88                -inf            0            0               G68
+       89                -inf            0            0               G69
+       90                -inf            0            0               G70
+       91                -inf            0            0               G71
+       92                -inf            0            0               G72
+       93                -inf            0            0               G73
+       94                -inf            0            0               G74
+       95                -inf            0            0               G75
+       96                -inf            0            0               G76
+       97                -inf            0            0               G77
+       98                -inf            0            0               G78
+       99                -inf            0            0               G79
+      100                -inf            0            0               G80
+      101                -inf            0            0               G81
+      102                -inf            0            0               G82
+      103                -inf            0            0               G83
+      104                -inf            0            0               G84
+      105                -inf            0            0               G85
+      106                -inf            0            0               G86
+      107                -inf            0            0               G87
+      108                -inf            0            0               G88
+      109                -inf            0            0               G89
+      110                -inf            0            0               G90
+      111                -inf            0            0               G91
+      112                -inf            0            0               G92
+      113                -inf            0            0               G93
+      114                -inf            0            0               G94
+      115                -inf            0            0               G95
+
+Model status: Optimal
+
+Objective value: 471.55
