@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}模型概览}{2}{}%
+\contentsline {section}{\numberline {2}目标函数}{2}{}%
+\contentsline {section}{\numberline {3}约束条件}{2}{}%
+\contentsline {subsection}{\numberline {3.1}等式约束 (7个)}{2}{}%
+\contentsline {subsection}{\numberline {3.2}不等式约束 (14个)}{3}{}%
+\contentsline {section}{\numberline {4}变量定义}{3}{}%
+\contentsline {subsection}{\numberline {4.1}二元变量 (12个)}{3}{}%
+\contentsline {subsection}{\numberline {4.2}连续变量 (12个)}{3}{}%
+\contentsline {section}{\numberline {5}求解结果}{3}{}%
+\contentsline {subsection}{\numberline {5.1}最优目标值}{3}{}%
+\contentsline {subsection}{\numberline {5.2}求解状态}{3}{}%
+\contentsline {subsection}{\numberline {5.3}最优解}{3}{}%
+\contentsline {section}{\numberline {6}求解信息汇总}{4}{}%
