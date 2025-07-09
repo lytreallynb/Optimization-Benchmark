@@ -1,45 +1,241 @@
-# MPS 模型求解与变量导出工具
+# MPS COPT Solver & LaTeX Report Generator
 
-## 📌 项目简介
+A comprehensive tool for solving Mathematical Programming System (MPS) files using the COPT solver and generating detailed LaTeX reports with complete solution analysis.
 
-本项目支持批量求解 `.mps` 数学优化模型，导出最优变量值为 Excel 表格（`.xlsx`），并生成 LaTeX 模型文档。
+## Features
 
-## 📂 文件结构
+- **MPS File Processing**: Reads and parses MPS format optimization problems
+- **COPT Integration**: Utilizes COPT solver for high-performance optimization
+- **LaTeX Report Generation**: Creates publication-ready reports with mathematical formatting
+- **Intelligent File Finding**: Supports flexible file path inputs
+- **Comprehensive Analysis**: Includes objective function, constraints, variables, and solution details
+- **Large Dataset Support**: Handles models with thousands of variables and constraints
 
-- `mps/`：原始 .mps 文件（模型）
-- `solutions/`：求解结果（.xlsx）
-- `tex/`：模型结构 LaTeX 文件
-- `logs/`：求解日志和输出记录
-- `scripts/`：所有 Python 求解脚本
+## Project Structure
 
-## 🚀 使用方法
-
-### 1. 求解单个模型
-
-```bash
-cd scripts
-python solution.py 文件名.mps
+```
+.
+├── mps/                    # MPS optimization problem files
+├── scripts/
+│   └── generate_report.py  # Main solver and report generator
+├── tex_reports/            # Generated LaTeX reports and PDFs
+├── solutions/              # Solution result files
+├── lptestset/             # Additional test problems
+├── logs/                  # Log files
+├── uploads/               # File upload directory
+└── work-log/              # Project documentation
 ```
 
-### 2. 批量求解所有模型
+## Requirements
+
+### Software Dependencies
+
+- **Python 3.7+**
+- **COPT Solver**: Commercial optimization solver
+- **LaTeX Distribution**: For PDF generation (recommended: TeX Live or MiKTeX)
+
+### Python Packages
 
 ```bash
-cd scripts
-python batch_solver.py
+pip install coptpy
 ```
 
-### 3. 生成 LaTeX 表达式（选做）
+### LaTeX Packages Required
+
+- `ctex` (for Chinese text support)
+- `amsmath` (mathematical expressions)
+- `longtable` (large tables)
+- `booktabs` (professional tables)
+- `geometry` (page layout)
+- `fancyhdr` (headers and footers)
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
+
+2. **Set up Python environment**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install coptpy
+   ```
+
+3. **Install LaTeX distribution**
+   - **Ubuntu/Debian**: `sudo apt-get install texlive-full`
+   - **macOS**: Install MacTeX
+   - **Windows**: Install MiKTeX or TeX Live
+
+4. **Verify COPT license**
+   Ensure you have a valid COPT license configured.
+
+## Usage
+
+### Basic Usage
+
+Run the main script and follow the interactive prompts:
 
 ```bash
-python model2.py
+python scripts/generate_report.py
 ```
 
-## 🔧 依赖安装
+When prompted, enter the MPS file name (supports multiple formats):
+- Full path: `mps/bk4x3.mps`
+- Relative path: `bk4x3.mps`
+- Base name only: `bk4x3`
+
+### Example Session
+
+```
+$ python scripts/generate_report.py
+============================================================
+MPS文件COPT求解器与LaTeX报告生成器
+============================================================
+请输入MPS文件名 (例如: bk4x3): bk4x3
+
+找到文件: mps/bk4x3.mps
+开始读取MPS文件...
+开始求解模型...
+模型求解成功，找到最优解
+最优目标值: 5.230000e+02
+变量数量: 15
+
+生成LaTeX报告...
+已生成完整的求解报告: tex_reports/bk4x3_COPT_REPORT.tex
+模型规模: 15个变量, 6个约束
+包含: 模型结构 + 完整求解结果 + 最优解表格
+
+报告生成完成!
+文件位置: tex_reports/bk4x3_COPT_REPORT.tex
+编译命令: cd tex_reports && xelatex bk4x3_COPT_REPORT.tex
+```
+
+### Generating PDF Reports
+
+After generating the LaTeX report, compile it to PDF:
 
 ```bash
-pip install pyscipopt pandas openpyxl
+cd tex_reports
+xelatex filename_COPT_REPORT.tex
 ```
 
-## 📌 作者
+This will generate a comprehensive PDF report containing:
+- Model overview and statistics
+- Formatted objective function
+- Complete constraint listing
+- Variable definitions
+- Optimal solution table
+- Solution summary
 
-内部使用工具，适合科研、教学或求解大规模线性优化模型。
+## Report Contents
+
+The generated LaTeX reports include:
+
+### 1. Model Overview
+- File information and model name
+- Problem dimensions (variables, constraints)
+- Model type (LP/MIP) classification
+- Optimization direction
+
+### 2. Objective Function
+- Mathematical formulation with proper subscripts
+- Variable coefficient analysis
+- Complete term-by-term breakdown
+
+### 3. Constraints
+- Equality and inequality constraints
+- Proper mathematical formatting
+- Named constraint references
+
+### 4. Variable Definitions
+- Binary and continuous variable specifications
+- Domain definitions
+- Variable range summaries
+
+### 5. Solution Results
+- Optimal objective value
+- Solver status information
+- Complete variable solution table
+- Solution verification
+
+## Supported File Formats
+
+- **MPS**: Mathematical Programming System format
+- **Output**: LaTeX (.tex) and PDF reports
+
+## Example Files
+
+The project includes several test problems in the `mps/` directory:
+
+- `bk4x3.mps`: Small test problem (15 variables, 6 constraints)
+- `bal8x12.mps`: Medium-scale problem
+- `gr4x6.mps`: Grid-based optimization problem
+- `n37xx.mps`: Large-scale numerical test suite
+- `ranXxY.mps`: Random problem instances
+
+## Troubleshooting
+
+### Common Issues
+
+1. **COPT License Error**
+   - Ensure COPT is properly licensed
+   - Check environment variables
+
+2. **LaTeX Compilation Errors**
+   - Install missing LaTeX packages
+   - Use `xelatex` for Chinese text support
+
+3. **File Not Found**
+   - Check file paths and extensions
+   - Ensure MPS files are in the `mps/` directory
+
+4. **Memory Issues with Large Models**
+   - The tool automatically handles large datasets
+   - Reports may take longer for models with 1000+ variables
+
+### File Path Examples
+
+The solver accepts various input formats:
+- `bk4x3` → finds `mps/bk4x3.mps`
+- `bk4x3.mps` → finds `mps/bk4x3.mps` or `./bk4x3.mps`
+- `mps/bk4x3.mps` → uses exact path
+
+## Development
+
+### Code Structure
+
+The main script (`generate_report.py`) contains:
+
+- `MPSCOPTSolver`: Main solver class
+- `find_mps_file()`: Intelligent file locator
+- LaTeX formatting methods for different report sections
+- Error handling and resource cleanup
+
+### Extending the Tool
+
+To add new features:
+1. Modify the `MPSCOPTSolver` class
+2. Add new formatting methods for additional report sections
+3. Update the LaTeX template as needed
+
+## License
+
+This project uses the COPT solver, which requires a commercial license. Please ensure compliance with COPT licensing terms.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with sample MPS files
+5. Submit a pull request
+
+## Support
+
+For issues related to:
+- **COPT Solver**: Contact COPT support
+- **LaTeX**: Check LaTeX documentation
+- **This Tool**: Create an issue in the repository
