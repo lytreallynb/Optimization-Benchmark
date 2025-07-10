@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-MPS文件COPT求解器与LaTeX报告生成器 (API最终修正版)
+MPS文件COPT求解器与LaTeX报告生成器 (最终版 - 排版修正 + 用户输入)
 本脚本根据 COPT 6.5.1 及以上版本的官方API进行了重构和修正。
 主要变更:
 - 放弃读写.lp文件，直接使用 coptpy API 获取模型信息。
 - 优化求解结果提取逻辑，确保在找到可行解但未达最优时也能生成报告。
-- [最终修正] 修复了获取模型统计信息的方式，使用正确的直接属性(如 model.Cols, model.Rows)
-  和迭代计数，替代了错误的 getAttr 调用。
-- [最终修正] 修复了获取模型名称的方式，使用文件名作为模型名，避免无效的API调用。
-- [最终修正] 修复了 LinExpr.size 的调用方式，其为属性而非方法。
-- [最终修正] 修复了 LinExpr.copy 的调用方式，该方法不存在且非必要。
-- [最终修正] 修复了 getConss 的调用方式，正确方法为 getConstrs。
-- [最终修正] 修复了 Constraint.Sense/Expr 的调用方式，改用更稳健的LB/UB属性和model.getRow()方法。
-- [最终修正] 移除了不存在的 COPT.USERINTERRUPT 状态枚举。
+- 修复了多个COPT API调用错误，使其与新版API兼容。
+- 增加了对过长约束条件的自动换行功能，解决了PDF排版溢出的问题。
+- 恢复了主函数的交互性，允许用户在运行时指定要处理的MPS文件名。
 """
 import coptpy as cp
 from coptpy import COPT
@@ -48,17 +43,17 @@ class MPSCOPTSolver:
         else:
             return self._escape_latex(var_name)
 
-    def _format_expr_to_latex(self, expr):
-        """将 coptpy.LinExpr 对象格式化为 LaTeX 字符串"""
-        # .size 是一个属性，不是方法
+    def _format_expr_to_latex(self, expr, terms_per_line=6):
+        """
+        将 coptpy.LinExpr 对象格式化为 LaTeX 字符串。
+        新增了 terms_per_line 参数和自动换行逻辑以修复排版问题。
+        """
         n_terms = expr.size
         if n_terms == 0:
             return "0"
         
         latex_expr = ""
         
-        # 按变量名排序以获得确定性输出
-        # LinExpr 没有 .copy() 方法，且此处为只读操作，无需复制。
         terms = sorted([(expr.getVar(i).Name, expr.getCoeff(i)) for i in range(n_terms)], key=lambda x: x[0])
         
         for i, (var_name, coeff) in enumerate(terms):
@@ -74,6 +69,9 @@ class MPSCOPTSolver:
             coeff_str = f"{coeff_val:g}" if coeff_val != 1 else ""
             
             latex_expr += f"{sign_str}{coeff_str}{var_name_latex}"
+
+            if (i + 1) % terms_per_line == 0 and (i + 1) < n_terms:
+                latex_expr += " \\\\[0.5ex]\n&\\quad "
         
         return latex_expr.lstrip(" +").strip()
 
@@ -85,37 +83,13 @@ class MPSCOPTSolver:
         
         latex_obj = "\\section{目标函数}\n\n"
         
-        # 完整目标函数
         latex_obj += "\\textbf{完整目标函数:}\n\n"
         latex_obj += "\\allowdisplaybreaks\n{\\small\n\\begin{align}\n"
         latex_obj += f"{sense_text} \\quad Z = &\\; "
         
-        full_obj_str = self._format_expr_to_latex(obj_expr)
-        
-        # 美化长公式断行
-        display_terms = re.split(r'\s*([+\-])\s*', full_obj_str)
-        if display_terms and display_terms[0] == '': display_terms.pop(0)
-
-        output_terms = []
-        # 第一个项可能没有前导符号
-        if display_terms and display_terms[0] not in '+-':
-            output_terms.append(display_terms.pop(0))
-
-        # 剩下的项都是 符号-数值 对
-        for i in range(0, len(display_terms), 2):
-            if i + 1 < len(display_terms):
-                output_terms.append(f"{display_terms[i]} {display_terms[i+1]}")
-            else:
-                output_terms.append(display_terms[i])
-
-        terms_per_line = 3
-        for i, term in enumerate(output_terms):
-            latex_obj += term
-            if (i + 1) % terms_per_line == 0 and (i + 1) < len(output_terms):
-                latex_obj += " \\\\[0.5ex]\n&\\; "
-            elif i < len(output_terms) - 1:
-                latex_obj += " "
+        full_obj_str = self._format_expr_to_latex(obj_expr, terms_per_line=3)
             
+        latex_obj += full_obj_str
         latex_obj += "\\nonumber\n\\end{align}\n}\n\n"
         return latex_obj
 
@@ -130,7 +104,6 @@ class MPSCOPTSolver:
 
         all_conss = sorted(all_conss, key=lambda c: c.Name)
 
-        # 不再使用 .Sense 属性，改用 LB/UB 判断，更稳健
         equality_constraints = []
         less_constraints = []
         greater_constraints = []
@@ -139,12 +112,11 @@ class MPSCOPTSolver:
         for c in all_conss:
             lb = c.LB
             ub = c.UB
-            
             is_le = ub < COPT.INFINITY
             is_ge = lb > -COPT.INFINITY
 
             if is_ge and is_le:
-                if abs(lb - ub) < 1e-9: # 浮点数比较
+                if abs(lb - ub) < 1e-9:
                     equality_constraints.append(c)
                 else:
                     ranged_constraints.append(c)
@@ -160,7 +132,6 @@ class MPSCOPTSolver:
             latex_constraints += f"\\subsection{{{title} ({len(con_list)}个)}}\n\n"
             latex_constraints += "\\allowdisplaybreaks\n{\\small\\begin{align}\n"
             for i, cons in enumerate(con_list):
-                # 使用 model.getRow(cons) 获取表达式，而不是 cons.Expr
                 expr = self.model.getRow(cons)
                 lhs = self._format_expr_to_latex(expr)
                 name = self._escape_latex(cons.Name)
@@ -251,8 +222,6 @@ class MPSCOPTSolver:
         
         latex_solution = "\\section{求解结果}\n\n"
         
-        # --- API 调用最终修正 ---
-        # 移除了不存在的 COPT.USERINTERRUPT 属性
         status_mapping = {
             COPT.OPTIMAL: "已得最优解 (Optimal)", COPT.INFEASIBLE: "不可行 (Infeasible)",
             COPT.UNBOUNDED: "无界 (Unbounded)", COPT.INF_OR_UNB: "不可行或无界",
@@ -260,7 +229,6 @@ class MPSCOPTSolver:
             COPT.INTERRUPTED: "求解被中断 (Interrupted)",
             COPT.NUMERICAL: "数值问题 (Numerical)", COPT.IMPRECISE: "解不精确 (Imprecise)",
         }
-        # --------------------
         status_text = status_mapping.get(self.solve_status, f"未知状态码 ({self.solve_status})")
         latex_solution += f"\\subsection{{求解状态}}\n\n求解状态: \\textbf{{{status_text}}}\n\n"
 
@@ -303,7 +271,7 @@ class MPSCOPTSolver:
         try:
             print("🚀 开始读取MPS文件...")
             self.model.read(self.mps_filepath)
-            self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name) # 读取后缓存变量
+            self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name)
             
             print("⚙️ 开始求解模型...")
             self.model.solve()
@@ -332,7 +300,7 @@ class MPSCOPTSolver:
             self.solve_status = None
 
     def extract_to_latex(self, output_filepath=None):
-        """提取模型信息并生成完整的LaTeX格式报告 (API已最终修正)"""
+        """提取模型信息并生成完整的LaTeX格式报告"""
         if self.model.Cols == 0:
             print("❗️ 模型尚未读取或读取失败，无法生成报告。")
             return None
@@ -349,10 +317,8 @@ class MPSCOPTSolver:
         
         current_time = datetime.datetime.now().strftime("%Y年%m月%d日 %H:%M:%S")
         
-        # model.Name 不是一个有效的属性。我们使用文件名作为模型名。
         model_name = os.path.splitext(os.path.basename(self.mps_filepath))[0]
             
-        # 使用正确的直接属性和迭代计数
         cols = self.model.Cols
         rows = self.model.Rows
         is_mip = self.model.IsMIP
@@ -406,7 +372,7 @@ class MPSCOPTSolver:
         with open(output_filepath, 'w', encoding='utf-8') as f:
             f.write(latex_content)
         
-        print(f"✅ 已生成基于API的求解报告: {output_filepath}")
+        print(f"✅ 已生成求解报告: {output_filepath}")
         return output_filepath
 
     def __del__(self):
@@ -430,14 +396,18 @@ def find_mps_file(filename_input):
             return path
     return None
 
+# ####################################################################
+# ## 函数修改处: 恢复main函数的交互性 ##
+# ####################################################################
 def main():
     """主函数"""
     print("=" * 60)
-    print("🔧 MPS文件COPT求解器与LaTeX报告生成器 (API最终修正版)")
+    print("🔧 MPS文件COPT求解器与LaTeX报告生成器 (最终版)")
     print("=" * 60)
     
     try:
-        filename_input = input("请输入MPS文件名 (例如: mps/ran12x12.mps 或 ran12x12): ").strip()
+        # 提示用户输入文件名
+        filename_input = input("请输入MPS文件名 (例如: mps/ran4x64.mps 或 ran4x64): ").strip()
         if not filename_input:
             print("❌ 未输入文件名，程序退出。")
             return
