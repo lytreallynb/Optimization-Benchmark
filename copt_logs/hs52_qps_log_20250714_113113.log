@@ -1,0 +1,46 @@
+Setting log file to copt_logs/hs52_qps_log_20250714_113113.log
+Setting parameter 'LpMethod' to 2
+Setting parameter 'FeasTol' to 1e-09
+Model fingerprint: 76045390
+
+Using Cardinal Optimizer v7.2.9 on macOS (aarch64)
+Hardware has 11 cores and 11 threads. Using instruction set ARMV8 (30)
+Minimizing a QP problem
+
+The original problem has:
+    3 rows, 5 columns and 7 non-zero elements
+    7 quadratic objective elements
+The presolved problem has:
+    0 rows, 4 columns and 0 non-zero elements
+    4 quadratic objective elements
+
+Starting barrier solver using 11 CPU threads
+
+Problem info:
+Dualized in presolve:            No
+Range of matrix coefficients:    [0e+00,0e+00]
+Range of rhs coefficients:       [0e+00,0e+00]
+Range of bound coefficients:     [0e+00,0e+00]
+Range of cost coefficients:      [0e+00,0e+00]
+
+Factor info:
+Number of free columns:          0
+Number of dense columns:         0
+Number of matrix entries:        0.000e+00
+Number of factor entries:        0.000e+00
+Number of factor flops:          0.000e+00
+
+Iter       Primal.Obj         Dual.Obj      Compl  Primal.Inf  Dual.Inf    Time
+   0  +6.00000000e+00  +6.00000000e+00   0.00e+00    0.00e+00  0.00e+00   0.01s
+
+Barrier status:                  OPTIMAL
+Primal objective:                6.00000000e+00
+Dual objective:                  6.00000000e+00
+Duality gap (abs/rel):           0.00e+00 / 0.00e+00
+Primal infeasibility (abs/rel):  0.00e+00 / 0.00e+00
+Dual infeasibility (abs/rel):    0.00e+00 / 0.00e+00
+
+Postsolving
+
+Solving finished
+Status: Optimal  Objective: 6.0000000000e+00  Iterations: 0  Time: 0.01s

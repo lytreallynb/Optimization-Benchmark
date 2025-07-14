@@ -1,0 +1,473 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath, amssymb, booktabs, geometry, longtable, xcolor, fancyhdr, array}
+\usepackage{breqn}  % 用于自动换行的数学公式
+\geometry{a4paper, left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
+
+% 允许公式跨页
+\allowdisplaybreaks[4]
+
+% 数学字体设置
+\usepackage{mathptmx}  % 使用Times字体
+\renewcommand{\familydefault}{\rmdefault}
+
+% 适中的行距设置
+\usepackage{setspace}
+\setstretch{1.1}
+
+% 数学公式的间距设置
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+
+\title{QPS格式二次规划问题分析报告\\{\large dpklo1}}
+\author{QPS解析器}
+\date{2025年07月14日 11:30:55}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{QPS分析报告}
+\fancyhead[R]{dpklo1}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{问题概述}
+\subsection{基本信息}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{属性} & \textbf{值} \\
+\midrule
+问题名称 & \texttt{} \\
+源文件 & \texttt{dpklo1.qps} \\
+问题类型 & 二次规划 (QP) \\
+变量数量 & 133 \\
+约束数量 & 77 \\
+二次项数 & 77 \\
+目标常数 & 0.0 \\
+\bottomrule
+\end{tabular}
+\caption{问题基本信息}
+\end{table}
+
+\section{数学模型}
+\subsection{优化模型}
+
+\textbf{目标函数:}
+
+\begin{align}
+\min\quad f(x) &= 0 \nonumber\\
+&\quad + \frac{1}{2} \sum_{i,j} Q_{ij} x_i x_j\label{eq:objective}
+\end{align}
+
+\textbf{二次项矩阵特征:}
+\begin{itemize}
+\item 对角线项: 77 个
+\item 非对角线项: 0 个
+\item 矩阵类型: 对称正定
+\end{itemize}
+
+\textbf{约束条件:}
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 24 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 25 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 26 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 28 个变量，负系数变量集合包含 2 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 27 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 29 个变量，负系数变量集合包含 1 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0 \nonumber
+\end{align}
+其中正系数变量集合包含 26 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 34.91 \nonumber
+\end{align}
+其中正系数变量集合包含 7 个变量，负系数变量集合包含 8 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -8.137 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -10.89 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -8.721 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 1.657 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -12.55 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -0.5977 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -10.1 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 32.74 \nonumber
+\end{align}
+其中正系数变量集合包含 12 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 8.308 \nonumber
+\end{align}
+其中正系数变量集合包含 12 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 2.971 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -5.213 \nonumber
+\end{align}
+其中正系数变量集合包含 11 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 7.147 \nonumber
+\end{align}
+其中正系数变量集合包含 12 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 5.222 \nonumber
+\end{align}
+其中正系数变量集合包含 12 个变量，负系数变量集合包含 3 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -14.28 \nonumber
+\end{align}
+其中正系数变量集合包含 7 个变量，负系数变量集合包含 8 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 10.31 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 7.404 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 5.675 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -6.622 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 0.4735 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 2.519 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -8.72 \nonumber
+\end{align}
+其中正系数变量集合包含 7 个变量，负系数变量集合包含 8 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 4.346 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 3.44 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 36.53 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -17.71 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -8.946 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -11.71 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 1.725 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -4.535 \nonumber
+\end{align}
+其中正系数变量集合包含 11 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -5.768 \nonumber
+\end{align}
+其中正系数变量集合包含 11 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -18.38 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 15.5 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 4.274 \nonumber
+\end{align}
+其中正系数变量集合包含 11 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 1.752 \nonumber
+\end{align}
+其中正系数变量集合包含 11 个变量，负系数变量集合包含 4 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -13.31 \nonumber
+\end{align}
+其中正系数变量集合包含 7 个变量，负系数变量集合包含 8 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 7.1 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -0.08035 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -10.97 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 5.342 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 15.78 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 4.775 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -1.926 \nonumber
+\end{align}
+其中正系数变量集合包含 7 个变量，负系数变量集合包含 8 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 6.435 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 3.58 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -9.909 \nonumber
+\end{align}
+其中正系数变量集合包含 8 个变量，负系数变量集合包含 7 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= -0.1876 \nonumber
+\end{align}
+其中正系数变量集合包含 9 个变量，负系数变量集合包含 6 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 4.523 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\begin{align}
+\sum_{i \in \mathcal{P}} x_i - \sum_{j \in \mathcal{N}} x_j &= 3.577 \nonumber
+\end{align}
+其中正系数变量集合包含 10 个变量，负系数变量集合包含 5 个变量。\\[0.3em]
+
+\textbf{变量边界:}
+\begin{itemize}
+\item 非负变量 $x_i \geq 0$: 133 个变量
+\end{itemize}
+
+\section{求解结果}
+
+求解状态: \textbf{数值问题 (Numerical)}
+
+未能获得可行解。
+
+\end{document}

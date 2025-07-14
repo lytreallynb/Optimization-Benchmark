@@ -1,0 +1,50 @@
+Setting log file to copt_logs/tame_qps_log_20250714_113131.log
+Setting parameter 'LpMethod' to 2
+Setting parameter 'FeasTol' to 1e-09
+Model fingerprint: e19a7aed
+
+Using Cardinal Optimizer v7.2.9 on macOS (aarch64)
+Hardware has 11 cores and 11 threads. Using instruction set ARMV8 (30)
+Minimizing a QP problem
+
+The original problem has:
+    1 rows, 2 columns and 2 non-zero elements
+    3 quadratic objective elements
+The presolved problem has:
+    2 rows, 3 columns and 5 non-zero elements
+    1 quadratic objective elements
+
+Starting barrier solver using 11 CPU threads
+
+Problem info:
+Dualized in presolve:            No
+Range of matrix coefficients:    [1e+00,1e+00]
+Range of rhs coefficients:       [1e+00,1e+00]
+Range of bound coefficients:     [0e+00,0e+00]
+Range of cost coefficients:      [0e+00,0e+00]
+Range of quadcost coefficients:  [1e+00,1e+00]
+
+Factor info:
+Number of free columns:          1
+Number of dense columns:         0
+Number of matrix entries:        3.000e+00
+Number of factor entries:        3.000e+00
+Number of factor flops:          5.000e+00
+
+Iter       Primal.Obj         Dual.Obj      Compl  Primal.Inf  Dual.Inf    Time
+   0  +0.00000000e+00  +0.00000000e+00   5.02e+05    1.00e+03  5.01e+02   0.01s
+   1  +0.00000000e+00  -4.99999999e+02   5.01e+02    1.00e-03  5.01e-04   0.01s
+   2  +0.00000000e+00  -1.00148953e-03   1.00e-03    1.00e-09  5.02e-10   0.01s
+   3  +0.00000000e+00  -1.00148953e-09   1.00e-09    1.11e-15  5.02e-16   0.01s
+
+Barrier status:                  OPTIMAL
+Primal objective:                0.00000000e+00
+Dual objective:                  -1.00148953e-09
+Duality gap (abs/rel):           1.00e-09 / 1.00e-09
+Primal infeasibility (abs/rel):  1.11e-15 / 1.11e-15
+Dual infeasibility (abs/rel):    5.02e-16 / 5.02e-16
+
+Postsolving
+
+Solving finished
+Status: Optimal  Objective: 0.0000000000e+00  Iterations: 3  Time: 0.01s

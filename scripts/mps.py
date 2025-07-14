@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-MPS文件COPT求解器与LaTeX报告生成器 (最终版 - 排版修正 + 用户输入)
-本脚本根据 COPT 6.5.1 及以上版本的官方API进行了重构和修正。
-主要变更:
-- 放弃读写.lp文件，直接使用 coptpy API 获取模型信息。
-- 优化求解结果提取逻辑，确保在找到可行解但未达最优时也能生成报告。
-- 修复了多个COPT API调用错误，使其与新版API兼容。
-- 增加了对过长约束条件的自动换行功能，解决了PDF排版溢出的问题。
-- 恢复了主函数的交互性，允许用户在运行时指定要处理的MPS文件名。
+MPS文件COPT求解器与LaTeX报告生成器 (增强版)
+
+本脚本根据 COPT 6.5.1 及以上版本的官方API进行开发。
+主要功能:
+- 读取MPS文件并使用COPT求解器求解
+- 生成完整的LaTeX格式报告
+- 支持自动换行以避免PDF排版问题
+- 将求解日志保存到单独的文件中
+- 智能查找多个目录下的MPS文件
 """
 import coptpy as cp
 from coptpy import COPT
 import os
 import re
 import datetime
+import sys
 
 class MPSCOPTSolver:
     """
@@ -29,7 +31,8 @@ class MPSCOPTSolver:
         self.solve_status = None
         self.objective_value = None
         self.solution = {}
-        self.all_vars_cache = None # 缓存变量列表
+        self.all_vars_cache = None  # 缓存变量列表
+        self.log_filepath = None    # 用于存储日志文件路径
 
     def _escape_latex(self, text):
         """转义 LaTeX 特殊字符"""
@@ -46,7 +49,7 @@ class MPSCOPTSolver:
     def _format_expr_to_latex(self, expr, terms_per_line=6):
         """
         将 coptpy.LinExpr 对象格式化为 LaTeX 字符串。
-        新增了 terms_per_line 参数和自动换行逻辑以修复排版问题。
+        包含自动换行逻辑以修复排版问题。
         """
         n_terms = expr.size
         if n_terms == 0:
@@ -269,11 +272,22 @@ class MPSCOPTSolver:
     def solve_model(self):
         """求解模型，并以更稳健的方式提取结果"""
         try:
-            print("🚀 开始读取MPS文件...")
+            print("开始读取MPS文件...")
             self.model.read(self.mps_filepath)
             self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name)
             
-            print("⚙️ 开始求解模型...")
+            # 设置日志文件
+            log_dir = "copt_logs"
+            os.makedirs(log_dir, exist_ok=True)
+            base_name = os.path.splitext(os.path.basename(self.mps_filepath))[0]
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.log_filepath = os.path.join(log_dir, f"{base_name}_log_{timestamp}.log")
+            
+            # 将求解过程的日志输出到指定文件
+            self.model.setLogFile(self.log_filepath)
+            print(f"求解日志将被记录到: {self.log_filepath}")
+
+            print("开始求解模型...")
             self.model.solve()
             
             self.solve_status = self.model.Status
@@ -282,31 +296,31 @@ class MPSCOPTSolver:
 
             if solution_available:
                 status_str = "已得最优解" if self.solve_status == COPT.OPTIMAL else "找到可行解"
-                print(f"✅ 模型求解完成: {status_str} (状态码: {self.solve_status})")
+                print(f"模型求解完成: {status_str} (状态码: {self.solve_status})")
 
                 self.objective_value = self.model.ObjVal
                 for var in self.all_vars_cache:
                     self.solution[var.Name] = var.X
-                print(f"📊 目标值: {self.objective_value:.8g}")
+                print(f"目标值: {self.objective_value:.8g}")
             else:
                 status_map = {COPT.INFEASIBLE: "不可行", COPT.UNBOUNDED: "无界"}
                 status_str = status_map.get(self.solve_status, f"未知状态 ({self.solve_status})")
-                print(f"❌ 模型求解失败或无解。状态: {status_str}")
+                print(f"模型求解失败或无解。状态: {status_str}")
                 self.objective_value = None
                 self.solution = {}
                 
         except Exception as e:
-            print(f"❌ 求解过程中发生严重错误: {e}")
+            print(f"求解过程中发生严重错误: {e}")
             self.solve_status = None
 
     def extract_to_latex(self, output_filepath=None):
         """提取模型信息并生成完整的LaTeX格式报告"""
         if self.model.Cols == 0:
-            print("❗️ 模型尚未读取或读取失败，无法生成报告。")
+            print("模型尚未读取或读取失败，无法生成报告。")
             return None
 
         if self.solve_status is None:
-            print("🤔 模型尚未求解，将仅生成模型结构报告...")
+            print("模型尚未求解，将仅生成模型结构报告...")
             self.solve_status = COPT.UNSTARTED
 
         if output_filepath is None:
@@ -372,7 +386,7 @@ class MPSCOPTSolver:
         with open(output_filepath, 'w', encoding='utf-8') as f:
             f.write(latex_content)
         
-        print(f"✅ 已生成求解报告: {output_filepath}")
+        print(f"已生成求解报告: {output_filepath}")
         return output_filepath
 
     def __del__(self):
@@ -384,57 +398,103 @@ class MPSCOPTSolver:
             pass
 
 def find_mps_file(filename_input):
-    """智能查找 MPS 文件"""
+    """智能查找 MPS 文件 - 支持多个目录"""
     base_name = filename_input.replace('.mps', '')
     possible_paths = [
-        filename_input,
-        f"{base_name}.mps",
-        os.path.join("mps", f"{base_name}.mps"),
+        filename_input,  # 原始输入路径
+        f"{base_name}.mps",  # 当前目录加扩展名
+        os.path.join("mps", f"{base_name}.mps"),  # mps目录
+        os.path.join("milp", f"{base_name}.mps"),  # milp目录
+        os.path.join("mps", filename_input),  # mps目录下的原始路径
+        os.path.join("milp", filename_input),  # milp目录下的原始路径
+        os.path.join("data", f"{base_name}.mps"),  # data目录
+        os.path.join("instances", f"{base_name}.mps"),  # instances目录
     ]
+    
+    print(f"查找文件: {filename_input}")
     for path in possible_paths:
         if os.path.exists(path):
+            print(f"  找到: {path}")
             return path
+        else:
+            print(f"  未找到: {path}")
     return None
 
-# ####################################################################
-# ## 函数修改处: 恢复main函数的交互性 ##
-# ####################################################################
+def list_mps_files():
+    """列出可用的MPS文件"""
+    mps_files = []
+    search_dirs = [".", "mps", "milp", "data", "instances"]
+    
+    for directory in search_dirs:
+        if os.path.exists(directory) and os.path.isdir(directory):
+            for file in os.listdir(directory):
+                if file.endswith('.mps') and os.path.isfile(os.path.join(directory, file)):
+                    if directory == ".":
+                        mps_files.append(file)
+                    else:
+                        mps_files.append(f"{directory}/{file}")
+    
+    return sorted(mps_files)
+
 def main():
     """主函数"""
     print("=" * 60)
-    print("🔧 MPS文件COPT求解器与LaTeX报告生成器 (最终版)")
+    print("MPS文件COPT求解器与LaTeX报告生成器 (增强版)")
     print("=" * 60)
     
     try:
-        # 提示用户输入文件名
-        filename_input = input("请输入MPS文件名 (例如: mps/ran4x64.mps 或 ran4x64): ").strip()
-        if not filename_input:
-            print("❌ 未输入文件名，程序退出。")
-            return
+        # 显示可用文件
+        available_files = list_mps_files()
+        if available_files:
+            print("\n可用的MPS文件:")
+            for i, file in enumerate(available_files[:10], 1):  # 只显示前10个
+                size = os.path.getsize(file)
+                print(f"  {i}. {file} ({size} 字节)")
+            if len(available_files) > 10:
+                print(f"  ...及其他 {len(available_files) - 10} 个文件")
+            print()
+        
+        # 检查命令行参数
+        if len(sys.argv) > 1:
+            filename_input = sys.argv[1]
+            print(f"使用命令行参数: {filename_input}")
+        else:
+            # 交互式输入
+            try:
+                filename_input = input("请输入MPS文件名 (例如: milp/22433.mps 或 22433): ").strip()
+                if not filename_input:
+                    print("未输入文件名，程序退出。")
+                    return
+            except (EOFError, KeyboardInterrupt):
+                print("输入被中断，程序退出。")
+                return
         
         actual_filepath = find_mps_file(filename_input)
         
         if actual_filepath is None:
-            print(f"❌ 文件 '{filename_input}' 未找到。请检查文件名和路径。")
+            print(f"\n文件 '{filename_input}' 未找到。")
+            print("请检查文件名和路径，或者查看上面列出的可用文件。")
             return
         
-        print(f"🔍 找到文件: {actual_filepath}")
+        print(f"\n找到文件: {actual_filepath}")
         
         solver = MPSCOPTSolver(actual_filepath)
         solver.solve_model()
         
-        print(f"\n📝 正在生成LaTeX报告...")
+        print("\n正在生成LaTeX报告...")
         report_path = solver.extract_to_latex()
         
         if report_path:
-            print(f"\n✨ 报告生成完成!")
-            print(f"📁 文件位置: {os.path.abspath(report_path)}")
+            print("\n任务完成!")
+            if solver.log_filepath:
+                print(f"求解日志位置: {os.path.abspath(solver.log_filepath)}")
+            print(f"LaTeX报告位置: {os.path.abspath(report_path)}")
             report_dir = os.path.dirname(os.path.abspath(report_path))
             report_basename = os.path.basename(report_path)
-            print(f"💡 如需生成PDF, 请在终端执行: cd \"{report_dir}\" && xelatex \"{report_basename}\"")
-        
+            print(f"如需生成PDF, 请在终端执行: cd \"{report_dir}\" && xelatex \"{report_basename}\"")
+
     except Exception as e:
-        print(f"❌ 处理过程中发生严重错误: {e}")
+        print(f"处理过程中发生严重错误: {e}")
         import traceback
         traceback.print_exc()
     

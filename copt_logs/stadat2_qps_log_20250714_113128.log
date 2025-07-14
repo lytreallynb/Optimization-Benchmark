@@ -1,0 +1,58 @@
+Setting log file to copt_logs/stadat2_qps_log_20250714_113128.log
+Setting parameter 'LpMethod' to 2
+Setting parameter 'FeasTol' to 1e-09
+Model fingerprint: 59c0cc0f
+
+Using Cardinal Optimizer v7.2.9 on macOS (aarch64)
+Hardware has 11 cores and 11 threads. Using instruction set ARMV8 (30)
+Minimizing a QP problem
+
+The original problem has:
+    3999 rows, 2001 columns and 9997 non-zero elements
+    2000 quadratic objective elements
+The presolved problem has:
+    3999 rows, 2001 columns and 9997 non-zero elements
+    2000 quadratic objective elements
+
+Starting barrier solver using 11 CPU threads
+
+Problem info:
+Dualized in presolve:            No
+Range of matrix coefficients:    [1e+03,2e+03]
+Range of rhs coefficients:       [5e+01,5e+01]
+Range of bound coefficients:     [0e+00,0e+00]
+Range of cost coefficients:      [7e-05,1e-01]
+Range of quadcost coefficients:  [5e-04,5e-04]
+
+Factor info:
+Number of free columns:          0
+Number of dense columns:         0
+Number of matrix entries:        1.799e+04
+Number of factor entries:        1.799e+04
+Number of factor flops:          8.192e+04
+
+Iter       Primal.Obj         Dual.Obj      Compl  Primal.Inf  Dual.Inf    Time
+   0  +2.69460223e+02  +2.53209511e+02   3.45e+04    1.06e+02  2.78e-01   0.01s
+   1  +9.36084159e+02  +4.44284819e+03   2.39e+04    6.83e+01  1.79e-01   0.01s
+   2  +2.69948419e+03  +2.95373037e+03   1.34e+04    3.17e+01  8.31e-02   0.01s
+   3  +3.27803840e+03  +2.26191618e+03   2.51e+03    3.91e+00  1.02e-02   0.01s
+   4  +3.22556988e+03  +2.30413786e+03   2.28e+03    3.57e+00  9.36e-03   0.01s
+   5  +2.81149052e+03  +2.56214584e+03   5.52e+02    8.90e-01  2.33e-03   0.01s
+   6  +2.65677133e+03  +2.63993134e+03   3.32e+01    5.12e-02  1.34e-04   0.01s
+   7  +2.64509315e+03  +2.64501803e+03   1.88e-01    3.55e-04  9.32e-07   0.01s
+   8  +2.64503535e+03  +2.64503535e+03   6.50e-07    3.71e-10  9.52e-13   0.01s
+   9  +2.64503535e+03  +2.64503535e+03   1.05e-08    1.24e-09  1.54e-13   0.01s
+  10  +2.64503535e+03  +2.64503535e+03   1.19e-11    1.25e-09  2.70e-12   0.02s
+  11  +2.64503535e+03  +2.64503535e+03   5.60e-15    4.37e-11  1.33e-12   0.02s
+
+Barrier status:                  OPTIMAL
+Primal objective:                2.64503535e+03
+Dual objective:                  2.64503535e+03
+Duality gap (abs/rel):           9.59e-08 / 3.63e-11
+Primal infeasibility (abs/rel):  4.37e-11 / 9.09e-13
+Dual infeasibility (abs/rel):    1.33e-12 / 1.33e-12
+
+Postsolving
+
+Solving finished
+Status: Optimal  Objective: 2.6450353474e+03  Iterations: 11  Time: 0.02s

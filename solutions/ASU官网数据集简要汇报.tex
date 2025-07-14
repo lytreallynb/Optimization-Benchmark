@@ -1,0 +1,104 @@
+\documentclass{article}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\usepackage{xeCJK}
+\setCJKmainfont{STSong}       % 支持中文
+\usepackage[dvipsnames]{xcolor}   % 加载丰富颜色
+\usepackage{sectsty}          % 更改节标题样式
+\sectionfont{\color{MidnightBlue}}       % section 标题蓝色
+\subsectionfont{\color{ForestGreen}}     % subsection 绿色
+\subsubsectionfont{\color{Purple}}       % subsubsection 紫色
+
+\usepackage{hyperref}
+
+\title{ASU PLATO “Testcases” 测试集概要}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{一、概览}
+ASU PLATO 的“Testcases”页面收录了大型优化问题测试集，覆盖线性、整数、二次、半正定、锥、非线性、随机、组合等多类模型。
+
+\section{主要分类}
+
+\subsection{混合整数线性规划（\textcolor{ForestGreen}{MILP}）}
+\begin{itemize}
+  \item MIPLIB 2017, MILPlib, Coral MIPlib, Atamtürk 集合, UniBo
+\end{itemize}
+
+\subsection{混合整数二次规划（\textcolor{ForestGreen}{MIQP/MIQCP}）}
+\begin{itemize}
+  \item QPlib（凸/非凸 QP）, MIQPlib
+\end{itemize}
+
+\subsection{随机规划（\textcolor{ForestGreen}{Stochastic Programming}）}
+\begin{itemize}
+  \item SMPS 格式, POSTS, Stochastic Integer Programming Test Library
+\end{itemize}
+
+\subsection{运输问题}
+\begin{itemize}
+  \item Fixed‑Charge Transportation Benchmark（MPS 格式）
+\end{itemize}
+
+\subsection{无约束最优化}
+\begin{itemize}
+  \item More–Garbow–Hillstrom, GKLS, 多目标/global 无约束问题
+\end{itemize}
+
+\subsection{非线性方程与最小二乘}
+\begin{itemize}
+  \item Netlib/Minpack, Coprin, Luksan 稀疏系统
+\end{itemize}
+
+\subsection{二次规划（QP）}
+\begin{itemize}
+  \item 扩展 QP/MPS/AMPL 格式问题, OSQP 基准
+\end{itemize}
+
+\subsection{半正定 \& 二阶锥规划（SDP/SOCP）}
+\begin{itemize}
+  \item CBLIB, SDPLIB, DIMACS SQL, SOTIROV, RDM, Kocvara, QAP SDP 松弛, SOCP, COMPlib
+\end{itemize}
+
+\subsection{一般非线性规划（NLP）}
+\begin{itemize}
+  \item Hock–Schittkowski, Himmelblau–Dembo, DONLP2
+\end{itemize}
+
+\subsection{稀疏/不可微优化与非线性系统}
+\begin{itemize}
+  \item 包含 PDE 优化实例、稀疏/不可微系统
+\end{itemize}
+
+\subsection{PDE 约束优化}
+\begin{itemize}
+  \item 椭圆/抛物 PDE 的 AMPL 实现, OPTPDE
+\end{itemize}
+
+\subsection{参数估计}
+\begin{itemize}
+  \item 约 1300 个数据拟合、系统辨识与非线性回归实例
+\end{itemize}
+
+\subsection{纯离散组合优化}
+\begin{itemize}
+  \item BiqMac, TSPLIB, QAPLIB, SATLIB, CSPLIB, SteinLib, PSPLIB, Taillard, OR‑Library
+\end{itemize}
+
+\subsection{标准格式集合}
+\begin{itemize}
+  \item CUTEst（SIF 格式）, Libopt 环境
+\end{itemize}
+
+\subsection{AMPL / GAMS 格式模型}
+\begin{itemize}
+  \item COCONUT, Vanderbei, COPS, MINLPLIB, MINLPtestproblems
+\end{itemize}
+
+\section*{结论}
+ASU PLATO Testcases 为优化算法与软件评估提供了覆盖广泛、结构多样的标准测试集，适用于研究与实际应用的对比与效果验证。
+
+\end{document}

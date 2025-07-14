@@ -1,0 +1,135 @@
+
+\documentclass[a4paper,10pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath, amssymb, longtable, booktabs, geometry, fancyhdr}
+\geometry{a4paper, left=1.5cm, right=1.5cm, top=2cm, bottom=2cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{数学优化模型求解报告}
+\fancyfoot[C]{\thepage}
+\allowdisplaybreaks[4]
+
+\title{数学优化模型求解报告\\{\large bk4x3.mps}}
+\author{COPT求解器}
+\date{报告生成时间: 2025年07月14日 10:42:38}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{模型概览}
+\begin{itemize}
+    \item \textbf{文件名:} \texttt{bk4x3.mps}
+    \item \textbf{模型名:} bk4x3
+    \item \textbf{变量总数:} 24 (二元: 12, 整数: 0, 连续: 12)
+    \item \textbf{约束总数:} 19
+    \item \textbf{优化方向:} 最小化 (Minimize)
+    \item \textbf{模型类型:} 混合整数规划 (MIP)
+\end{itemize}
+\section{目标函数}
+
+\textbf{完整目标函数:}
+
+\allowdisplaybreaks
+{\small
+\begin{align}
+\min \quad Z = &\; 2X_{0} + 3X_{1} + 5X_{10} \\[0.5ex]
+&\quad  + 2X_{11} + 4X_{2} + 3X_{3} \\[0.5ex]
+&\quad  + 2X_{4} + X_{5} + X_{6} \\[0.5ex]
+&\quad  + 4X_{7} + 3X_{8} + 4X_{9} \\[0.5ex]
+&\quad  + 10Y_{0} + 30Y_{1} + 30Y_{10} \\[0.5ex]
+&\quad  + 20Y_{11} + 20Y_{2} + 10Y_{3} \\[0.5ex]
+&\quad  + 30Y_{4} + 20Y_{5} + 10Y_{6} \\[0.5ex]
+&\quad  + 30Y_{7} + 20Y_{8} + 10Y_{9}\nonumber
+\end{align}
+}
+
+\section{约束条件}
+
+\subsection{等式约束 (7个)}
+
+\allowdisplaybreaks
+{\small\begin{align}
+X_{0} + X_{1} + X_{2} &= 10 && \text{(A0)} \\
+X_{3} + X_{4} + X_{5} &= 30 && \text{(A1)} \\
+X_{6} + X_{7} + X_{8} &= 40 && \text{(A2)} \\
+X_{10} + X_{11} + X_{9} &= 20 && \text{(A3)} \\
+X_{0} + X_{3} + X_{6} + X_{9} &= 20 && \text{(B0)} \\
+X_{1} + X_{10} + X_{4} + X_{7} &= 50 && \text{(B1)} \\
+X_{11} + X_{2} + X_{5} + X_{8} &= 30 && \text{(B2)} \\
+\end{align}}
+
+\subsection{小于等于约束 (12个)}
+
+\allowdisplaybreaks
+{\small\begin{align}
+X_{0} - 10Y_{0} &\leq 0 && \text{(G0)} \\
+X_{1} - 10Y_{1} &\leq 0 && \text{(G1)} \\
+X_{10} - 20Y_{10} &\leq 0 && \text{(G10)} \\
+X_{11} - 20Y_{11} &\leq 0 && \text{(G11)} \\
+X_{2} - 10Y_{2} &\leq 0 && \text{(G2)} \\
+X_{3} - 20Y_{3} &\leq 0 && \text{(G3)} \\
+X_{4} - 30Y_{4} &\leq 0 && \text{(G4)} \\
+X_{5} - 30Y_{5} &\leq 0 && \text{(G5)} \\
+X_{6} - 20Y_{6} &\leq 0 && \text{(G6)} \\
+X_{7} - 40Y_{7} &\leq 0 && \text{(G7)} \\
+X_{8} - 30Y_{8} &\leq 0 && \text{(G8)} \\
+X_{9} - 20Y_{9} &\leq 0 && \text{(G9)} \\
+\end{align}}
+
+\section{变量定义}
+
+\subsection{二元变量 (12个)}
+
+{\small $Y_{0}$, $Y_{1}$, $Y_{10}$, $Y_{11}$, $Y_{2}$, $Y_{3}$, $Y_{4}$, $Y_{5}$, $Y_{6}$, $Y_{7}$, $Y_{8}$, $Y_{9}$}
+
+变量类型: $v \in \{0,1\}$
+
+\subsection{连续变量 (12个)}
+
+所有连续变量均为非负实数 ($v \geq 0$)。
+
+\section{求解结果}
+
+\subsection{求解状态}
+
+求解状态: \textbf{已得最优解 (Optimal)}
+
+\subsection{目标函数值}
+
+最优目标值为: $\mathbf{350}$
+
+\subsection{变量取值}
+
+共有 24 个变量，其中 10 个变量的取值非零。
+
+\begin{center}
+\begin{longtable}{cc}
+\toprule
+\textbf{变量名} & \textbf{取值} \\
+\midrule
+\endfirsthead
+\multicolumn{2}{c}{\textit{续表}} \\
+\toprule
+\textbf{变量名} & \textbf{取值} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+$X_{2}$ & 10 \\
+$Y_{2}$ & 1 \\
+$X_{4}$ & 30 \\
+$Y_{4}$ & 1 \\
+$X_{6}$ & 20 \\
+$Y_{6}$ & 1 \\
+$X_{7}$ & 20 \\
+$Y_{7}$ & 1 \\
+$X_{11}$ & 20 \\
+$Y_{11}$ & 1 \\
+\end{longtable}
+\end{center}
+
+\end{document}

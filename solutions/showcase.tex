@@ -1,0 +1,356 @@
+\documentclass[10pt]{beamer}
+
+% --- 主题与基础包 ---
+\usetheme[progressbar=frametitle]{metropolis}
+\usepackage{appendixnumberbeamer}
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+\usepackage{xspace}
+\usepackage{amsmath} % 为数学公式添加支持
+\usepackage{graphicx} % 在导言区引入
+
+% --- 中文支持 ---
+\usepackage{ctex}
+
+% \usepackage{fontspec} % 字体设置
+% \setmainfont{Fira Sans} % 设置主字体为 Fira Sans
+% \setsansfont{Fira Sans} % 设置无衬线字体为 Fira Sans
+% \setmonofont{Fira Code} % 设置等宽字体为 Fira
+
+
+% --- 标题与作者信息 ---
+\title{ASU优化基准平台}
+\subtitle{理解与参与策略}
+\date{} % 留空以不显示日期
+\author{COPT战略分析团队}
+\institute{内部战略研讨}
+
+\begin{document}
+
+% --- 标题页 ---
+\maketitle
+
+% --- 目录页 ---
+\begin{frame}{目录}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents
+\end{frame}
+
+% --- 第一部分：平台介绍 ---
+\section{平台介绍}
+
+\begin{frame}{平台概述}
+  \textbf{什么是ASU优化基准？}
+  \begin{itemize}
+    \item \textbf{维护方}: 由亚利桑那州立大学（ASU）的Hans Mittelmann教授精心维护。
+    \item \textbf{核心功能}: 为多种优化问题类型的求解器提供一个全面、权威的基准测试平台。
+    \item \textbf{涵盖范围}: 覆盖LP、MILP、SDP、SOCP、NLP、QP及其他专业优化问题。
+    \item \textbf{评估方法}: 使用\textbf{移位几何平均数（Shifted Geometric Mean）}进行严谨的性能比较。
+    \item \textbf{资源提供}: 提供所有测试的日志文件和详细的性能分析报告，确保透明度和可追溯性。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{可分析的基准类别}
+  \textbf{我们可以分析的问题类型：}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.5\textwidth}
+      \begin{itemize}
+        \item \textbf{线性规划 (LP)}
+        \begin{itemize}
+          \item LPfeas (可行性问题)
+          \item LPopt (最优化问题)
+          \item 大型网络LP问题
+        \end{itemize}
+        \item \textbf{混合整数规划 (MILP)}
+        \begin{itemize}
+          \item MIPLIB2017等标准基准
+          \item 病态案例
+          \item 不可行性检测
+        \end{itemize}
+        \item \textbf{半定规划 (SDP)}
+        \begin{itemize}
+          \item 稀疏SDP问题
+          \item 不可行SDP问题
+        \end{itemize}
+      \end{itemize}
+    \column{0.5\textwidth}
+      \begin{itemize}
+        \item \textbf{二阶锥规划 (SOCP)}
+        \begin{itemize}
+          \item 大型SOCP问题
+        \end{itemize}
+        \item \textbf{非线性规划 (NLP)}
+        \begin{itemize}
+          \item AMPL-NLP基准
+        \end{itemize}
+        \item \textbf{二次规划 (QP)}
+        \begin{itemize}
+          \item 凸/非凸QP
+          \item 二进制/连续变量变体
+        \end{itemize}
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+% --- 第二部分：机遇与战略 ---
+\section{机遇与战略}
+
+\begin{frame}{当前格局与机遇}
+  \textbf{市场定位与发展机遇}
+  \begin{block}{当前格局}
+    在2018至2024年间，多家主流商业求解器（如 \textbf{CPLEX, Gurobi, XPRESS}）已相继退出该基准测试。
+  \end{block}
+  
+  \begin{alertblock}{我们的机遇}
+    \begin{itemize}
+        \item \textbf{开放空间}: 为新求解器创造了参与竞争、获得全球可见度的绝佳机会。
+        \item \textbf{已有验证}: 根据Mittelmann基准数据，\textbf{COPT} 已展现出顶级性能。
+        \item \textbf{活跃社区}: 通过\textbf{NEOS平台}，已有约60个求解器参与，形成活跃的学术和研究社区。
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{战略收益}
+  \textbf{为什么参与至关重要？}
+  \begin{itemize}
+    \item \textbf{提升可见度 (Visibility)}
+      \begin{itemize}
+        \item 在全球优化社区获得权威认可与品牌曝光。
+      \end{itemize}
+    \item \textbf{性能验证 (Validation)}
+      \begin{itemize}
+        \item 通过独立第三方平台，客观验证求解器性能与稳定性。
+      \end{itemize}
+    \item \textbf{扩大研究影响 (Research Impact)}
+      \begin{itemize}
+        \item 被全球顶尖大学及研究机构在学术研究中参考使用。
+      \end{itemize}
+    \item \textbf{驱动持续优化 (Benchmarking)}
+      \begin{itemize}
+        \item 持续跟踪与对手的性能对比，为产品迭代提供数据支持。
+      \end{itemize}
+    \item \textbf{融入前沿社区 (Community)}
+      \begin{itemize}
+        \item 接触尖端测试问题，与全球研究者建立合作。
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+% --- 第三部分：执行计划 ---
+\section{执行计划}
+
+\begin{frame}{参与流程}
+  \textbf{如何提交我们的求解器？}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.5\textwidth}
+      \begin{block}{选项一：NEOS服务器集成}
+        \begin{itemize}
+          \item \textbf{联系方式}: \texttt{support@neos-server.org}
+          \item \textbf{流程}: 提供求解器描述和文档，与NEOS平台进行技术集成。
+          \item \textbf{优势}: 获得更广泛的用户可访问性和社区曝光度。
+        \end{itemize}
+      \end{block}
+    \column{0.5\textwidth}
+      \begin{block}{选项二：ASU直接托管}
+        \begin{itemize}
+          \item \textbf{联系方式}: Hans Mittelmann 教授 (\texttt{mittelmann@asu.edu})
+          \item \textbf{流程}: 直接联系Mittelmann教授，在ASU服务器上托管求解器。
+          \item \textbf{优势}: 更直接、更快速地参与基准测试。
+        \end{itemize}
+      \end{block}
+  \end{columns}
+  
+  \begin{exampleblock}{基本要求}
+    \begin{itemize}
+      \item \textbf{求解器文档}: 清晰、完整的技术和使用文档。
+      \item \textbf{性能测试能力}: 确保求解器能够稳定运行测试案例。
+      \item \textbf{维护承诺}: 积极响应并进行维护（Mittelmann教授每周花费数小时更新）。
+    \end{itemize}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{技术实施计划}
+  \textbf{我们的方法与时间表}
+  \begin{itemize}
+    \item \textbf{第一阶段：分析与提取}
+      \begin{itemize}
+        \item 任务：提取并分析现有基准案例的数学模型与数据结构。
+      \end{itemize}
+    \item \textbf{第二阶段：开发处理管道}
+      \begin{itemize}
+        \item 任务：开发强大的Python处理管道，处理多种输入格式。
+      \end{itemize}
+    \item \textbf{第三阶段：提交与集成}
+      \begin{itemize}
+        \item 任务：提交我们的求解器，完成与NEOS或ASU平台的集成。
+      \end{itemize}
+    \item \textbf{第四阶段：监控与迭代}
+      \begin{itemize}
+        \item 任务：监控性能排名，分析结果，根据反馈迭代改进。
+      \end{itemize}
+  \end{itemize}
+  \begin{alertblock}{预计时间表}
+    我们在预期时间内完成完整的技术集成和初步的性能展示。
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{下一步行动}
+  \textbf{即刻启动，明确目标}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.5\textwidth}
+      \begin{block}{立即行动 (Immediate Actions)}
+        \begin{enumerate}
+          \item \textbf{模型提取}: 从Mittelmann网站提取基准测试案例的数学模型。
+          \item \textbf{脚本开发}: 启动灵活的Python脚本开发工作，处理不同模型格式。
+          \item \textbf{建立联系}: 与Hans Mittelmann教授建立初步联系，表达参与意向。
+          \item \textbf{文档准备}: 整理并打包求解器的技术文档、安装指南和性能说明。
+        \end{enumerate}
+      \end{block}
+    \column{0.5\textwidth}
+      \begin{exampleblock}{成功指标 (Success Metrics)}
+        \begin{itemize}
+          \item \textbf{排名目标}: 在核心基准类别中获得有竞争力的性能排名。
+          \item \textbf{集成成功}: 成功将求解器与NEOS平台集成并稳定运行。
+          \item \textbf{持续优化}: 建立定期性能监控和优化的内部流程。
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+% --- 第四部分：COPT求解器使用展示 (新增) ---
+\section{COPT 求解器使用展示}
+
+\begin{frame}[allowframebreaks]{产品设计理念：强大的“引擎”}
+  \textbf{COPT本质上是一个优化求解器引擎，而非一个带图形界面的软件。}
+
+  \begin{columns}[T,onlytextwidth]
+    \column{0.5\textwidth}
+      \begin{alertblock}{它是什么？}
+        \begin{itemize}
+          \item 一个高性能的数学计算核心。
+          \item 通过编程接口(API)被调用。
+          \item 主要面向开发者和数据科学家。
+        \end{itemize}
+      \end{alertblock}
+    \column{0.5\textwidth}
+      \begin{block}{它不是什么？}
+        \begin{itemize}
+          \item 一个像Excel那样的点击式应用。
+          \item 不需要用户手动“操作界面”。
+          \item 它的“界面”就是代码本身。
+        \end{itemize}
+      \end{block}
+  \end{columns}
+
+  \begin{center}
+    \vspace{0.5cm}
+    可以把它理解为汽车的\textbf{发动机}，而不是整台汽车。开发者围绕这个“引擎”构建完整的应用程序。
+  \end{center}
+\end{frame}
+
+\begin{frame}{核心工作流程}
+  \textbf{从问题到答案，只需四步：}
+  \begin{enumerate}[<+-| alert@+>]
+    \item \textbf{引入库}: 在Python环境中，引入COPT功能库。
+    \item \textbf{建立模型}: 使用API，将业务问题中的变量、约束、目标翻译成代码。
+    \item \textbf{启动求解}: 调用简单命令，启动求解器引擎进行计算。
+    \item \textbf{获取结果}: 从返回结果中，提取最优决策方案指导业务。
+  \end{enumerate}
+  \vspace{1cm}
+  \begin{center}
+  \large
+  这个流程将复杂的运筹学理论，封装在简单易用的编程接口背后。
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{API调用示例：一个简单的线性规划问题}
+  \textbf{数学模型:}
+  \begin{equation*}
+    \begin{array}{ll@{}ll}
+      \text{max}  & x + 2y \\
+      \text{s.t.} & -x + y \leq 1 \\
+                  & x + y \leq 2 \\
+                  & x, y \geq 0
+    \end{array}
+  \end{equation*}
+
+  \textbf{对应的Python代码:}
+
+{\footnotesize
+\begin{verbatim}
+import coptpy as cp
+
+# 1. 创建模型
+mdl = cp.Envr().createModel("lp_example")
+
+# 2. 创建变量
+x = mdl.addVar(name="x")
+y = mdl.addVar(name="y")
+
+# 3. 添加约束
+mdl.addConstr(-x + y <= 1)
+mdl.addConstr(x + y <= 2)
+
+# 4. 定义目标函数
+mdl.setObjective(x + 2*y, cp.COPT.MAXIMIZE)
+
+# 5. 求解模型
+mdl.solve()
+
+# 6. 打印结果
+print("Optimal value: {}".format(mdl.objval))
+print("x={}, y={}".format(x.x, y.x))
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{API的价值：连接数学理论与商业实践}
+  \textbf{API是翻译器，也是连接器，将抽象的数学模型转化为可执行的商业逻辑。}
+  \begin{block}{如何帮助导出数学模型？}
+    API提供了一套与数学符号高度对应的语言。研究员脑中的公式，可以直接“翻译”成代码。
+    \begin{itemize}
+      \item \textbf{数学公式}: $\sum_{i=1}^{n} c_i x_i \leq B$
+      \item \textbf{对应代码}: \\ \texttt{mdl.addConstr(cp.quicksum(c[i]*x[i] for i in range(n)) <= B)}
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{API的商业用途是什么？}
+    \begin{itemize}
+      \item \textbf{自动化决策}: 嵌入企业ERP、WMS等系统，实现供应链、排产、定价等自动优化。
+      \item \textbf{定制化应用}: 根据独特业务场景，开发专属优化工具，而非使用通用软件。
+      \item \textbf{“What-if”分析}: 快速调整模型参数，模拟不同市场环境下的最优策略，支持决策。
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
+
+% --- 新增幻灯片 ---
+\begin{frame}[allowframebreaks]{COPT 性能优势与展望}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \begin{alertblock}{核心优势 (做得好)}
+        \begin{itemize}
+          \item \textbf{线性规划 (LP) \& 混合整数规划 (MIP)}: 根据Mittelmann榜单，COPT在核心领域性能达到世界顶尖水平。
+          \item \textbf{二阶锥/二次/半定规划}: 在凸二次规划、二阶锥规划和半定规划领域，性能位居世界前列。
+          \item \textbf{技术创新}: 发布支持GPU加速的一阶算法求解器，满足超大规模问题求解需求。
+        \end{itemize}
+      \end{alertblock}
+    \column{0.48\textwidth}
+      \begin{block}{持续发展方向 (做得更好)}
+        \begin{itemize}
+          \item \textbf{通用非线性规划 (NLP)}: 持续提升对非凸、非线性模型处理能力。
+          \item \textbf{生态系统与社区}: 加强用户社区、第三方工具与文档建设，构建强大生态系统。
+          \item \textbf{前沿算法探索}: 投入新算法研究，解决专门化和结构特殊问题，提高针对性和效率。
+        \end{itemize}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+
+
+% --- 结尾 ---
+{\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+  Q \& A
+\end{frame}
+}
+
+\end{document}

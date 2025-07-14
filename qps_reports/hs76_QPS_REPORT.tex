@@ -1,0 +1,135 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath, amssymb, booktabs, geometry, longtable, xcolor, fancyhdr, array}
+\usepackage{breqn}  % 用于自动换行的数学公式
+\geometry{a4paper, left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
+
+% 允许公式跨页
+\allowdisplaybreaks[4]
+
+% 数学字体设置
+\usepackage{mathptmx}  % 使用Times字体
+\renewcommand{\familydefault}{\rmdefault}
+
+% 适中的行距设置
+\usepackage{setspace}
+\setstretch{1.1}
+
+% 数学公式的间距设置
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+
+\title{QPS格式二次规划问题分析报告\\{\large hs76}}
+\author{QPS解析器}
+\date{2025年07月14日 11:31:17}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{QPS分析报告}
+\fancyhead[R]{hs76}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{问题概述}
+\subsection{基本信息}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{属性} & \textbf{值} \\
+\midrule
+问题名称 & \texttt{} \\
+源文件 & \texttt{hs76.qps} \\
+问题类型 & 二次规划 (QP) \\
+变量数量 & 4 \\
+约束数量 & 3 \\
+二次项数 & 8 \\
+目标常数 & 0.0 \\
+\bottomrule
+\end{tabular}
+\caption{问题基本信息}
+\end{table}
+
+\section{数学模型}
+\subsection{优化模型}
+
+\textbf{目标函数:}
+
+\begin{align}
+\min\quad f(x) &= 0 - 1\,C_{1} - 3\,C_{2} + 1\,C_{3} - 1\,C_{4} \nonumber\\
+&\quad + \frac{1}{2} \sum_{i,j} Q_{ij} x_i x_j\label{eq:objective}
+\end{align}
+
+\textbf{二次项矩阵特征:}
+\begin{itemize}
+\item 对角线项: 4 个
+\item 非对角线项: 2 个
+\item 矩阵类型: 对称正定
+\end{itemize}
+
+\textbf{约束条件:}
+\begin{align}
+1\,C_{1} + 2\,C_{2} + 1\,C_{3} + 1\,C_{4} &\leq 5 \nonumber
+\end{align}
+
+\begin{align}
+3\,C_{1} + 1\,C_{2} + 2\,C_{3} - 1\,C_{4} &\leq 4 \nonumber
+\end{align}
+
+\begin{align}
+1\,C_{2} + 4\,C_{3} &\geq 1.5 \nonumber
+\end{align}
+
+\textbf{变量边界:}
+\begin{itemize}
+\item 非负变量 $x_i \geq 0$: 4 个变量
+\end{itemize}
+
+\section{求解结果}
+
+\subsection{最优解}
+\begin{itemize}
+\item \textbf{求解状态:} \textcolor{green}{最优解}
+\item \textbf{目标函数值:} $-4.68181818168$
+\item \textbf{求解时间:} 0.007 秒
+\item \textbf{非零变量:} 4/4
+\end{itemize}
+
+\subsection{解的分析}
+\begin{itemize}
+\item 非零变量平均值: 0.727273
+\item 非零变量标准差: 0.810571
+\item 最大变量值: 2.09091
+\item 最小变量值: 4.36959e-11
+\end{itemize}
+
+
+\subsection{所有非零变量值}
+\begin{longtable}{p{2.5cm}@{\hspace{0.5em}}r@{\hspace{0.8em}}p{3.5cm}}
+\toprule
+\textbf{变量} & \textbf{值} & \textbf{边界} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{c}{\textit{续表}} \\
+\toprule
+\textbf{变量} & \textbf{值} & \textbf{边界} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+$C_{2}$ & 2.090909 & [0, ∞) \\
+$C_{4}$ & 0.545455 & [0, ∞) \\
+$C_{1}$ & 0.272727 & [0, ∞) \\
+$C_{3}$ & 4.370e-11 & [0, ∞) \\
+\bottomrule
+\caption{所有非零变量值（按绝对值排序）}
+\end{longtable}
+\end{document}

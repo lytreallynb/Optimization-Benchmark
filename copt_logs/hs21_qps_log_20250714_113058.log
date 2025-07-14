@@ -1,0 +1,54 @@
+Setting log file to copt_logs/hs21_qps_log_20250714_113058.log
+Setting parameter 'LpMethod' to 2
+Setting parameter 'FeasTol' to 1e-09
+Model fingerprint: 5224292
+
+Using Cardinal Optimizer v7.2.9 on macOS (aarch64)
+Hardware has 11 cores and 11 threads. Using instruction set ARMV8 (30)
+Minimizing a QP problem
+
+The original problem has:
+    1 rows, 2 columns and 2 non-zero elements
+    2 quadratic objective elements
+The presolved problem has:
+    1 rows, 2 columns and 2 non-zero elements
+    2 quadratic objective elements
+
+Starting barrier solver using 11 CPU threads
+
+Problem info:
+Dualized in presolve:            No
+Range of matrix coefficients:    [1e+00,1e+01]
+Range of rhs coefficients:       [1e+01,1e+01]
+Range of bound coefficients:     [2e+00,5e+01]
+Range of cost coefficients:      [0e+00,0e+00]
+Range of quadcost coefficients:  [1e-02,1e+00]
+
+Factor info:
+Number of free columns:          0
+Number of dense columns:         0
+Number of matrix entries:        1.000e+00
+Number of factor entries:        1.000e+00
+Number of factor flops:          1.000e+00
+
+Iter       Primal.Obj         Dual.Obj      Compl  Primal.Inf  Dual.Inf    Time
+   0  -9.71337080e+01  -1.04424973e+03   1.48e+03    1.35e+02  6.33e+00   0.00s
+   1  -9.97255473e+01  -2.22528178e+02   1.45e+02    1.07e+01  5.03e-01   0.00s
+   2  -9.97851125e+01  -1.01359532e+02   1.76e+00    1.11e-01  5.21e-03   0.00s
+   3  -9.99307184e+01  -1.00023499e+02   9.41e-02    1.71e-03  8.00e-05   0.00s
+   4  -9.99588775e+01  -9.99957128e+01   3.72e-02    7.14e-04  3.35e-05   0.00s
+   5  -9.99552731e+01  -9.99610908e+01   5.88e-03    1.14e-04  5.35e-06   0.00s
+   6  -9.99599778e+01  -9.99600019e+01   2.42e-05    8.47e-09  3.97e-10   0.00s
+   7  -9.99600000e+01  -9.99600000e+01   2.71e-11    1.05e-14  3.97e-16   0.00s
+
+Barrier status:                  OPTIMAL
+Primal objective:                -9.99600000e+01
+Dual objective:                  -9.99600000e+01
+Duality gap (abs/rel):           2.71e-11 / 2.71e-13
+Primal infeasibility (abs/rel):  1.05e-14 / 1.05e-15
+Dual infeasibility (abs/rel):    3.97e-16 / 3.97e-16
+
+Postsolving
+
+Solving finished
+Status: Optimal  Objective: -9.9960000000e+01  Iterations: 7  Time: 0.01s
