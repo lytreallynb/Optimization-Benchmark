@@ -9,6 +9,7 @@ MPS文件COPT求解器与LaTeX报告生成器 (增强版)
 - 支持自动换行以避免PDF排版问题
 - 将求解日志保存到单独的文件中
 - 智能查找多个目录下的MPS文件
+- 智能变量名格式化和排序 (新增功能)
 """
 import coptpy as cp
 from coptpy import COPT
@@ -16,6 +17,7 @@ import os
 import re
 import datetime
 import sys
+from collections import defaultdict
 
 class MPSCOPTSolver:
     """
@@ -33,18 +35,73 @@ class MPSCOPTSolver:
         self.solution = {}
         self.all_vars_cache = None  # 缓存变量列表
         self.log_filepath = None    # 用于存储日志文件路径
+        self.var_prefix_counts = {}  # 存储每个变量前缀的计数信息
+
+    def _analyze_variable_patterns(self):
+        """分析变量模式，确定每个前缀的变量数量和所需的零填充位数"""
+        if self.all_vars_cache is None:
+            self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name)
+        
+        prefix_max_numbers = defaultdict(int)
+        
+        for var in self.all_vars_cache:
+            match = re.match(r"([a-zA-Z_]+)(\d+)", var.Name)
+            if match:
+                prefix = match.group(1)
+                number = int(match.group(2))
+                prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+        
+        # 确定每个前缀需要的零填充位数
+        for prefix, max_num in prefix_max_numbers.items():
+            if max_num >= 100:
+                padding = 3  # 001, 002, ..., 999
+            elif max_num >= 10:
+                padding = 2  # 01, 02, ..., 99
+            else:
+                padding = 1  # 1, 2, ..., 9
+            
+            self.var_prefix_counts[prefix] = {
+                'max_number': max_num,
+                'padding': padding
+            }
 
     def _escape_latex(self, text):
         """转义 LaTeX 特殊字符"""
         return str(text).replace('\\', r'\textbackslash{}').replace('_', r'\_').replace('%', r'\%').replace('$', r'\$').replace('&', r'\&').replace('#', r'\#').replace('{', r'\{').replace('}', r'\}')
 
     def _parse_variable_name(self, var_name):
-        """将变量名 'VarName123' 转换为 LaTeX 下标格式 'VarName_{123}'"""
+        """
+        将变量名转换为 LaTeX 下标格式，使用智能零填充
+        例如: X1 -> X_{001} (如果有超过99个X变量)
+        """
         match = re.match(r"([a-zA-Z_]+)(\d+)", var_name)
         if match:
-            return f"{self._escape_latex(match.group(1))}_{{{match.group(2)}}}"
+            prefix = match.group(1)
+            number = int(match.group(2))
+            
+            # 使用预先分析的填充信息
+            if prefix in self.var_prefix_counts:
+                padding = self.var_prefix_counts[prefix]['padding']
+                formatted_number = str(number).zfill(padding)
+            else:
+                formatted_number = str(number)
+            
+            return f"{self._escape_latex(prefix)}_{{{formatted_number}}}"
         else:
             return self._escape_latex(var_name)
+
+    def _get_variable_sort_key(self, var_name):
+        """
+        生成用于排序的键值，确保变量按照前缀和数字正确排序
+        例如: X1, X2, X10, Y1, Y2 而不是 X1, X10, X2, Y1, Y2
+        """
+        match = re.match(r"([a-zA-Z_]+)(\d+)", var_name)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return (prefix, number)
+        else:
+            return (var_name, 0)
 
     def _format_expr_to_latex(self, expr, terms_per_line=6):
         """
@@ -57,7 +114,9 @@ class MPSCOPTSolver:
         
         latex_expr = ""
         
-        terms = sorted([(expr.getVar(i).Name, expr.getCoeff(i)) for i in range(n_terms)], key=lambda x: x[0])
+        # 使用新的排序方法
+        terms = [(expr.getVar(i).Name, expr.getCoeff(i)) for i in range(n_terms)]
+        terms = sorted(terms, key=lambda x: self._get_variable_sort_key(x[0]))
         
         for i, (var_name, coeff) in enumerate(terms):
             var_name_latex = self._parse_variable_name(var_name)
@@ -96,6 +155,19 @@ class MPSCOPTSolver:
         latex_obj += "\\nonumber\n\\end{align}\n}\n\n"
         return latex_obj
 
+    def _get_constraint_sort_key(self, cons_name):
+        """
+        生成用于约束排序的键值，确保约束按照前缀和数字正确排序
+        例如: C1, C2, C10, R1, R2 而不是 C1, C10, C2, R1, R2
+        """
+        match = re.match(r"([a-zA-Z_]+)(\d+)", cons_name)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return (prefix, number)
+        else:
+            return (cons_name, 0)
+
     def _format_constraints_from_api(self):
         """使用 COPT API 将约束条件格式化为 LaTeX"""
         model = self.model
@@ -105,7 +177,8 @@ class MPSCOPTSolver:
         if not all_conss:
             return latex_constraints + "模型中没有约束条件。\n\n"
 
-        all_conss = sorted(all_conss, key=lambda c: c.Name)
+        # 使用智能排序方法对所有约束进行排序
+        all_conss = sorted(all_conss, key=lambda c: self._get_constraint_sort_key(c.Name))
 
         equality_constraints = []
         less_constraints = []
@@ -132,9 +205,12 @@ class MPSCOPTSolver:
             nonlocal latex_constraints
             if not con_list: return
 
-            latex_constraints += f"\\subsection{{{title} ({len(con_list)}个)}}\n\n"
+            # 对每个约束组内部也进行排序
+            con_list_sorted = sorted(con_list, key=lambda c: self._get_constraint_sort_key(c.Name))
+            
+            latex_constraints += f"\\subsection{{{title} ({len(con_list_sorted)}个)}}\n\n"
             latex_constraints += "\\allowdisplaybreaks\n{\\small\\begin{align}\n"
-            for i, cons in enumerate(con_list):
+            for i, cons in enumerate(con_list_sorted):
                 expr = self.model.getRow(cons)
                 lhs = self._format_expr_to_latex(expr)
                 name = self._escape_latex(cons.Name)
@@ -157,9 +233,12 @@ class MPSCOPTSolver:
             nonlocal latex_constraints
             if not con_list: return
 
-            latex_constraints += f"\\subsection{{{title} ({len(con_list)}个)}}\n\n"
+            # 对范围约束组内部也进行排序
+            con_list_sorted = sorted(con_list, key=lambda c: self._get_constraint_sort_key(c.Name))
+            
+            latex_constraints += f"\\subsection{{{title} ({len(con_list_sorted)}个)}}\n\n"
             latex_constraints += "\\allowdisplaybreaks\n{\\small\\begin{align}\n"
-            for i, cons in enumerate(con_list):
+            for i, cons in enumerate(con_list_sorted):
                 expr = self.model.getRow(cons)
                 lhs = self._format_expr_to_latex(expr)
                 name = self._escape_latex(cons.Name)
@@ -199,7 +278,9 @@ class MPSCOPTSolver:
             display_limit = 100
             sample_vars = vars_list[:display_limit]
             
-            formatted_vars = [self._parse_variable_name(var.Name) for var in sample_vars]
+            # 使用新的排序和格式化方法
+            sample_vars_sorted = sorted(sample_vars, key=lambda v: self._get_variable_sort_key(v.Name))
+            formatted_vars = [self._parse_variable_name(var.Name) for var in sample_vars_sorted]
             latex_vars += "{\\small $" + "$, $".join(formatted_vars) + "$}\n\n"
             latex_vars += f"变量类型: $v \\in {var_type_latex}$\n\n"
             if len(vars_list) > display_limit:
@@ -219,7 +300,7 @@ class MPSCOPTSolver:
         return latex_vars
 
     def _format_solution_table(self):
-        """格式化求解结果表格"""
+        """格式化求解结果表格，使用改进的排序和格式化"""
         if self.solve_status is None or self.solve_status == COPT.UNSTARTED:
              return "\\section{求解结果}\n\n\\textbf{注意:} 模型尚未求解。\n\n"
         
@@ -246,11 +327,8 @@ class MPSCOPTSolver:
             latex_solution += "\\subsection{变量取值}\n\n"
             nonzero_solution = {k: v for k, v in self.solution.items() if abs(v) > 1e-9}
             
-            def sort_key(item):
-                match = re.search(r'\d+', item[0])
-                return int(match.group()) if match else float('inf')
-
-            all_vars_sorted = sorted(nonzero_solution.items(), key=sort_key)
+            # 使用改进的排序方法，确保按照前缀和数字正确排序
+            all_vars_sorted = sorted(nonzero_solution.items(), key=lambda item: self._get_variable_sort_key(item[0]))
             
             latex_solution += f"共有 {len(self.solution)} 个变量，其中 {len(nonzero_solution)} 个变量的取值非零。\n\n"
 
@@ -275,6 +353,10 @@ class MPSCOPTSolver:
             print("开始读取MPS文件...")
             self.model.read(self.mps_filepath)
             self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name)
+            
+            # 分析变量模式，为智能格式化做准备
+            print("分析变量命名模式...")
+            self._analyze_variable_patterns()
             
             # 设置日志文件
             log_dir = "copt_logs"
@@ -323,6 +405,10 @@ class MPSCOPTSolver:
             print("模型尚未求解，将仅生成模型结构报告...")
             self.solve_status = COPT.UNSTARTED
 
+        # 确保变量模式已经分析
+        if not self.var_prefix_counts:
+            self._analyze_variable_patterns()
+
         if output_filepath is None:
             tex_reports_dir = "tex_reports"
             os.makedirs(tex_reports_dir, exist_ok=True)
@@ -357,7 +443,7 @@ class MPSCOPTSolver:
 \\allowdisplaybreaks[4]
 
 \\title{{数学优化模型求解报告\\\\{{\\large {self._escape_latex(os.path.basename(self.mps_filepath))}}}}}
-\\author{{COPT求解器}}
+\\author{{COPT求解器 (Enhanced Version)}}
 \\date{{报告生成时间: {current_time}}}
 
 \\begin{{document}}
@@ -373,6 +459,12 @@ class MPSCOPTSolver:
     \\item \\textbf{{约束总数:}} {rows}
     \\item \\textbf{{优化方向:}} {'最小化 (Minimize)' if self.model.ObjSense == COPT.MINIMIZE else '最大化 (Maximize)'}
     \\item \\textbf{{模型类型:}} {model_type}
+\\end{{itemize}}
+
+\\textbf{{格式化和排序说明:}} 本报告采用以下规范以提高可读性：
+\\begin{{itemize}}
+    \\item \\textbf{{变量命名:}} 采用智能零填充格式，根据各变量前缀的数量自动调整。例如，若存在超过99个X变量，则格式化为$X_{{001}}, X_{{002}}, \\ldots$；若变量数量在10-99之间，则格式化为$X_{{01}}, X_{{02}}, \\ldots$。
+    \\item \\textbf{{排序规则:}} 变量和约束条件均按前缀字母顺序，然后按数字大小进行排序，确保逻辑顺序（如$X_1, X_2, \\ldots, X_{{10}}$而非$X_1, X_{{10}}, X_2$）。
 \\end{{itemize}}
 """
         
@@ -440,6 +532,7 @@ def main():
     """主函数"""
     print("=" * 60)
     print("MPS文件COPT求解器与LaTeX报告生成器 (增强版)")
+    print("支持智能变量格式化和排序")
     print("=" * 60)
     
     try:
@@ -492,6 +585,11 @@ def main():
             report_dir = os.path.dirname(os.path.abspath(report_path))
             report_basename = os.path.basename(report_path)
             print(f"如需生成PDF, 请在终端执行: cd \"{report_dir}\" && xelatex \"{report_basename}\"")
+            print("\n新功能说明:")
+            print("- 变量名现在使用智能零填充格式 (例如: X_{001}, Y_{01})")
+            print("- 解表格中的变量按照前缀和数字正确排序")
+            print("- 约束条件也按照前缀和数字正确排序")
+            print("- 报告更适合研究人员阅读和引用")
 
     except Exception as e:
         print(f"处理过程中发生严重错误: {e}")

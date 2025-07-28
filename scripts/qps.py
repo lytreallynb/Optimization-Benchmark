@@ -3,6 +3,7 @@
 """
 QPS格式解析器 (简化高效版)
 一键求解，自动生成LaTeX报告
+支持智能变量格式化和排序 (新增功能)
 """
 
 import os
@@ -182,12 +183,154 @@ class QPSSolver:
         self.solution = {}
         self.solve_time = 0
         self.log_filepath = None
+        self.var_prefix_counts = {}  # 存储每个变量前缀的计数信息
+        
+    def _analyze_variable_patterns(self):
+        """分析变量模式，确定每个前缀的变量数量和所需的零填充位数"""
+        all_vars = set()
+        
+        # 收集所有变量
+        for col_name in self.parser.cols.keys():
+            all_vars.add(col_name)
+        for var1, var2 in self.parser.quadobj.keys():
+            all_vars.add(var1)
+            all_vars.add(var2)
+        
+        prefix_max_numbers = defaultdict(int)
+        
+        for var_name in all_vars:
+            # 处理包含连字符的特殊变量名
+            if '------' in var_name:
+                parts = var_name.split('------')
+                if len(parts) == 2:
+                    prefix = parts[0]
+                    try:
+                        number = int(parts[1])
+                        prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+                    except ValueError:
+                        pass
+            elif '-----' in var_name:
+                parts = var_name.split('-----')
+                if len(parts) == 2:
+                    prefix = parts[0]
+                    try:
+                        number = int(parts[1])
+                        prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+                    except ValueError:
+                        pass
+            elif '----' in var_name:
+                parts = var_name.split('----')
+                if len(parts) == 2:
+                    prefix = parts[0]
+                    try:
+                        number = int(parts[1])
+                        prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+                    except ValueError:
+                        pass
+            elif '---' in var_name:
+                parts = var_name.split('---')
+                if len(parts) == 2:
+                    prefix = parts[0]
+                    try:
+                        number = int(parts[1])
+                        prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+                    except ValueError:
+                        pass
+            else:
+                # 标准的字母+数字格式
+                match = re.match(r"([a-zA-Z_]+)(\d+)", var_name)
+                if match:
+                    prefix = match.group(1)
+                    number = int(match.group(2))
+                    prefix_max_numbers[prefix] = max(prefix_max_numbers[prefix], number)
+        
+        # 确定每个前缀需要的零填充位数
+        for prefix, max_num in prefix_max_numbers.items():
+            if max_num >= 100:
+                padding = 3  # 001, 002, ..., 999
+            elif max_num >= 10:
+                padding = 2  # 01, 02, ..., 99
+            else:
+                padding = 1  # 1, 2, ..., 9
+            
+            self.var_prefix_counts[prefix] = {
+                'max_number': max_num,
+                'padding': padding
+            }
+
+    def _get_variable_sort_key(self, var_name):
+        """
+        生成用于排序的键值，确保变量按照前缀和数字正确排序
+        处理各种连字符格式
+        """
+        # 处理包含连字符的特殊变量名
+        if '------' in var_name:
+            parts = var_name.split('------')
+            if len(parts) == 2:
+                prefix = parts[0]
+                try:
+                    number = int(parts[1])
+                    return (prefix, number)
+                except ValueError:
+                    return (var_name, 0)
+        elif '-----' in var_name:
+            parts = var_name.split('-----')
+            if len(parts) == 2:
+                prefix = parts[0]
+                try:
+                    number = int(parts[1])
+                    return (prefix, number)
+                except ValueError:
+                    return (var_name, 0)
+        elif '----' in var_name:
+            parts = var_name.split('----')
+            if len(parts) == 2:
+                prefix = parts[0]
+                try:
+                    number = int(parts[1])
+                    return (prefix, number)
+                except ValueError:
+                    return (var_name, 0)
+        elif '---' in var_name:
+            parts = var_name.split('---')
+            if len(parts) == 2:
+                prefix = parts[0]
+                try:
+                    number = int(parts[1])
+                    return (prefix, number)
+                except ValueError:
+                    return (var_name, 0)
+        
+        # 标准的字母+数字格式
+        match = re.match(r"([a-zA-Z_]+)(\d+)", var_name)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return (prefix, number)
+        else:
+            return (var_name, 0)
+
+    def _get_constraint_sort_key(self, cons_name):
+        """
+        生成用于约束排序的键值，确保约束按照前缀和数字正确排序
+        """
+        match = re.match(r"([a-zA-Z_]+)(\d+)", cons_name)
+        if match:
+            prefix = match.group(1)
+            number = int(match.group(2))
+            return (prefix, number)
+        else:
+            return (cons_name, 0)
         
     def solve_model(self):
         """一键求解：解析 -> 构建 -> 求解"""
         try:
             # 解析QPS文件
             self.parser.parse()
+            
+            # 分析变量模式，为智能格式化做准备
+            print("分析变量命名模式...")
+            self._analyze_variable_patterns()
             
             # 设置日志文件
             log_dir = "copt_logs"
@@ -270,8 +413,8 @@ class QPSSolver:
             all_vars.add(var1)
             all_vars.add(var2)
         
-        # 创建COPT变量
-        for var_name in sorted(all_vars):
+        # 使用智能排序创建COPT变量
+        for var_name in sorted(all_vars, key=self._get_variable_sort_key):
             lb, ub = self.parser.bounds.get(var_name, (0.0, float('inf')))
             
             if ub == float('inf'):
@@ -292,9 +435,10 @@ class QPSSolver:
         linear_expr = None
         quad_expr = None
         
-        # 构建线性项
+        # 构建线性项 - 使用排序确保一致性
         if self.parser.obj_name:
-            for col_name, row_coeffs in self.parser.cols.items():
+            for col_name in sorted(self.parser.cols.keys(), key=self._get_variable_sort_key):
+                row_coeffs = self.parser.cols[col_name]
                 if self.parser.obj_name in row_coeffs and col_name in self.variables:
                     coeff = row_coeffs[self.parser.obj_name]
                     if linear_expr is None:
@@ -302,12 +446,12 @@ class QPSSolver:
                     else:
                         linear_expr += coeff * self.variables[col_name]
         
-        # 构建二次项
+        # 构建二次项 - 使用排序确保一致性
         processed_pairs = set()
-        for (var1, var2), coeff in self.parser.quadobj.items():
+        for (var1, var2), coeff in sorted(self.parser.quadobj.items(), key=lambda x: (self._get_variable_sort_key(x[0][0]), self._get_variable_sort_key(x[0][1]))):
             if var1 in self.variables and var2 in self.variables:
                 # 避免重复处理对称项
-                pair = tuple(sorted([var1, var2]))
+                pair = tuple(sorted([var1, var2], key=self._get_variable_sort_key))
                 if pair in processed_pairs:
                     continue
                 processed_pairs.add(pair)
@@ -352,12 +496,14 @@ class QPSSolver:
         """添加约束"""
         constraint_count = 0
         
-        for row_name, (sense, rhs) in self.parser.rows.items():
+        # 使用排序确保约束的一致性
+        for row_name, (sense, rhs) in sorted(self.parser.rows.items(), key=lambda x: self._get_constraint_sort_key(x[0])):
             if sense == 'N':
                 continue
             
             expr = 0
-            for col_name, row_coeffs in self.parser.cols.items():
+            for col_name in sorted(self.parser.cols.keys(), key=self._get_variable_sort_key):
+                row_coeffs = self.parser.cols[col_name]
                 if row_name in row_coeffs and col_name in self.variables:
                     coeff = row_coeffs[row_name]
                     expr += coeff * self.variables[col_name]
@@ -389,41 +535,87 @@ class QPSSolver:
         return text
 
     def _parse_variable_name(self, var_name):
-        """将变量名转换为LaTeX下标格式，特别处理包含连字符的变量名"""
+        """
+        将变量名转换为LaTeX下标格式，使用智能零填充
+        特别处理包含连字符的变量名，如 R------1, C------2
+        """
         # 特殊处理包含多个连字符的变量名，如 R------1, C------2
         if '------' in var_name:
             parts = var_name.split('------')
             if len(parts) == 2:
-                prefix = parts[0]  # 不转义前缀中的连字符，保持原样
-                number = parts[1]
-                return f"{prefix}_{{{number}}}"
+                prefix = parts[0]  # 保留前缀中的连字符
+                try:
+                    number = int(parts[1])
+                    # 使用智能零填充
+                    if prefix in self.var_prefix_counts:
+                        padding = self.var_prefix_counts[prefix]['padding']
+                        formatted_number = str(number).zfill(padding)
+                    else:
+                        formatted_number = str(number)
+                    return f"{prefix}_{{{formatted_number}}}"
+                except ValueError:
+                    return self._escape_latex(var_name)
         
         # 处理其他连字符模式，如 R-----1, R----1 等
         if '-----' in var_name:
             parts = var_name.split('-----')
             if len(parts) == 2:
                 prefix = parts[0]
-                number = parts[1]
-                return f"{prefix}_{{{number}}}"
+                try:
+                    number = int(parts[1])
+                    if prefix in self.var_prefix_counts:
+                        padding = self.var_prefix_counts[prefix]['padding']
+                        formatted_number = str(number).zfill(padding)
+                    else:
+                        formatted_number = str(number)
+                    return f"{prefix}_{{{formatted_number}}}"
+                except ValueError:
+                    return self._escape_latex(var_name)
         
         if '----' in var_name:
             parts = var_name.split('----')
             if len(parts) == 2:
                 prefix = parts[0]
-                number = parts[1]
-                return f"{prefix}_{{{number}}}"
+                try:
+                    number = int(parts[1])
+                    if prefix in self.var_prefix_counts:
+                        padding = self.var_prefix_counts[prefix]['padding']
+                        formatted_number = str(number).zfill(padding)
+                    else:
+                        formatted_number = str(number)
+                    return f"{prefix}_{{{formatted_number}}}"
+                except ValueError:
+                    return self._escape_latex(var_name)
         
         if '---' in var_name:
             parts = var_name.split('---')
             if len(parts) == 2:
                 prefix = parts[0]
-                number = parts[1]
-                return f"{prefix}_{{{number}}}"
+                try:
+                    number = int(parts[1])
+                    if prefix in self.var_prefix_counts:
+                        padding = self.var_prefix_counts[prefix]['padding']
+                        formatted_number = str(number).zfill(padding)
+                    else:
+                        formatted_number = str(number)
+                    return f"{prefix}_{{{formatted_number}}}"
+                except ValueError:
+                    return self._escape_latex(var_name)
         
         # 标准的字母+数字格式处理
         match = re.match(r"([a-zA-Z_]+)(\d+)", var_name)
         if match:
-            return f"{self._escape_latex(match.group(1))}_{{{match.group(2)}}}"
+            prefix = match.group(1)
+            number = int(match.group(2))
+            
+            # 使用预先分析的填充信息
+            if prefix in self.var_prefix_counts:
+                padding = self.var_prefix_counts[prefix]['padding']
+                formatted_number = str(number).zfill(padding)
+            else:
+                formatted_number = str(number)
+            
+            return f"{self._escape_latex(prefix)}_{{{formatted_number}}}"
         else:
             return self._escape_latex(var_name)
 
@@ -442,7 +634,7 @@ class QPSSolver:
         else:
             latex += "0"
         
-        # 线性项 - 详细展示
+        # 线性项 - 详细展示，使用排序
         if self.parser.obj_name:
             linear_terms = {}
             for col_name, row_coeffs in self.parser.cols.items():
@@ -453,7 +645,8 @@ class QPSSolver:
                 terms_per_line = 4
                 current_line_count = 0
                 
-                for i, (var, coeff) in enumerate(sorted(linear_terms.items())):
+                # 使用智能排序
+                for i, (var, coeff) in enumerate(sorted(linear_terms.items(), key=lambda x: self._get_variable_sort_key(x[0]))):
                     if abs(coeff) > 1e-12:
                         if current_line_count >= terms_per_line:
                             latex += " \\nonumber\\\\\n&\\quad"
@@ -486,12 +679,15 @@ class QPSSolver:
             latex += f"\\item 矩阵类型: 对称正定\n"
             latex += "\\end{itemize}\n\n"
         
-        # 约束条件详细描述
+        # 约束条件详细描述 - 使用排序
         constraints = [(name, sense, rhs) for name, (sense, rhs) in self.parser.rows.items() if sense != 'N']
         if constraints:
             latex += "\\textbf{约束条件:}\n"
             
-            for i, (name, sense, rhs) in enumerate(constraints):
+            # 对约束进行排序
+            constraints_sorted = sorted(constraints, key=lambda x: self._get_constraint_sort_key(x[0]))
+            
+            for i, (name, sense, rhs) in enumerate(constraints_sorted):
                 constraint_terms = {}
                 for col_name, row_coeffs in self.parser.cols.items():
                     if name in row_coeffs:
@@ -515,13 +711,13 @@ class QPSSolver:
                         latex += "\\end{align}\n"
                         latex += f"约束包含 {len(constraint_terms)} 个变量。\\\\[0.3em]\n\n"
                 else:
-                    # 详细显示约束
+                    # 详细显示约束 - 使用排序
                     latex += "\\begin{align}\n"
                     terms_per_line = 4
                     current_count = 0
                     first_term = True
                     
-                    for var, coeff in sorted(constraint_terms.items()):
+                    for var, coeff in sorted(constraint_terms.items(), key=lambda x: self._get_variable_sort_key(x[0])):
                         if abs(coeff) > 1e-12:
                             if current_count >= terms_per_line:
                                 latex += " \\nonumber\\\\\n&\\quad"
@@ -641,7 +837,7 @@ class QPSSolver:
 \\setlength{{\\belowdisplayshortskip}}{{3pt}}
 
 \\title{{QPS格式二次规划问题分析报告\\\\{{\\large {model_name}}}}}
-\\author{{QPS解析器}}
+\\author{{QPS解析器 (Enhanced Version)}}
 \\date{{{current_time}}}
 
 \\pagestyle{{fancy}}
@@ -674,6 +870,13 @@ class QPSSolver:
 \\end{{tabular}}
 \\caption{{问题基本信息}}
 \\end{{table}}
+
+\\textbf{{格式化和排序说明:}} 本报告采用以下规范以提高可读性：
+\\begin{{itemize}}
+    \\item \\textbf{{变量命名:}} 采用智能零填充格式，根据各变量前缀的数量自动调整。例如，若存在超过99个X变量，则格式化为$X_{{001}}, X_{{002}}, \\ldots$；若变量数量在10-99之间，则格式化为$X_{{01}}, X_{{02}}, \\ldots$。
+    \\item \\textbf{{排序规则:}} 变量和约束条件均按前缀字母顺序，然后按数字大小进行排序，确保逻辑顺序（如$X_1, X_2, \\ldots, X_{{10}}$而非$X_1, X_{{10}}, X_2$）。
+    \\item \\textbf{{特殊处理:}} 对于包含连字符的变量名（如R\\text{{------}}1），保持原始格式并应用智能排序。
+\\end{{itemize}}
 
 """
         
@@ -715,8 +918,8 @@ class QPSSolver:
 \\endlastfoot
 """
             
-            # 显示所有非零变量
-            sorted_vars = sorted(nonzero_solution.items(), key=lambda x: abs(x[1]), reverse=True)
+            # 显示所有非零变量 - 使用智能排序
+            sorted_vars = sorted(nonzero_solution.items(), key=lambda x: self._get_variable_sort_key(x[0]))
             for var_name, value in sorted_vars:
                 lb, ub = self.parser.bounds.get(var_name, (0.0, float('inf')))
                 
@@ -733,7 +936,7 @@ class QPSSolver:
                 latex_content += f"${var_display}$ & {value_str} & {bound_str} \\\\\n"
             
             latex_content += """\\bottomrule
-\\caption{所有非零变量值（按绝对值排序）}
+\\caption{所有非零变量值（按变量名排序）}
 \\end{longtable}
 """
         else:
@@ -782,7 +985,8 @@ def find_qps_file(filename_input):
 def main():
     """主函数"""
     print("=" * 60)
-    print("QPS文件COPT求解器与LaTeX报告生成器 (简化版)")
+    print("QPS文件COPT求解器与LaTeX报告生成器 (增强版)")
+    print("支持智能变量格式化和排序")
     print("=" * 60)
     
     try:
@@ -823,6 +1027,11 @@ def main():
             report_dir = os.path.dirname(os.path.abspath(report_path))
             report_basename = os.path.basename(report_path)
             print(f"如需生成PDF, 请在终端执行: cd \"{report_dir}\" && xelatex \"{report_basename}\"")
+            print("\n新功能说明:")
+            print("- 变量名现在使用智能零填充格式 (例如: X_{001}, Y_{01})")
+            print("- 所有变量和约束按照前缀和数字正确排序")
+            print("- 特殊处理包含连字符的变量名格式")
+            print("- 报告更适合研究人员阅读和引用")
 
     except Exception as e:
         print(f"处理过程中发生严重错误: {e}")
