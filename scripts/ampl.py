@@ -21,7 +21,6 @@ import traceback
 import numpy as np
 from pathlib import Path
 from collections import defaultdict
-import numpy as np
 
 try:
     from amplpy import AMPL, Environment
@@ -527,7 +526,7 @@ class AMPLSolver:
                         print(f"获取变量 {var_name} 时出错: {e}")
                         continue
                 
-                print(f"✅ 最优目标值: {self.objective_value}")
+                print(f"最优目标值: {self.objective_value}")
                 
                 # 安全地处理变量值统计
                 try:
