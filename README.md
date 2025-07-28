@@ -40,7 +40,6 @@ project/
 ├── qps/                     # QPS files directory  
 ├── milp/                    # Alternative MPS files directory
 ├── data/                    # Data files directory
-├── instances/               # Problem instances directory
 ├── tex_reports/             # LaTeX reports output (MPS)
 ├── qps_reports/             # LaTeX reports output (QPS)
 ├── copt_logs/               # Solver logs directory
@@ -74,7 +73,7 @@ python mps.py milp/problem_name
 ```
 
 The script will:
-- Search for the file in multiple directories (`./`, `mps/`, `milp/`, `data/`, `instances/`)
+- Search for the file in multiple directories (`./`, `mps/`, `milp/`, `data/`)
 - Load and solve the optimization problem
 - Generate a LaTeX report: `tex_reports/{filename}_COPT_REPORT.tex`
 - Save solver logs: `copt_logs/{filename}_log_{timestamp}.log`
