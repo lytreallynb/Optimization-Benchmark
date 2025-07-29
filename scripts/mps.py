@@ -10,6 +10,13 @@ MPS文件COPT求解器与LaTeX报告生成器 (增强版)
 - 将求解日志保存到单独的文件中
 - 智能查找多个目录下的MPS文件
 - 智能变量名格式化和排序 (新增功能)
+
+详细中文注释:
+本脚本专门处理MPS格式的数学规划模型文件，MPS是一种工业标准格式，
+用于表示线性规划(LP)、混合整数规划(MIP)和二次规划(QP)问题。
+脚本使用COPT（Cardinal Optimizer）求解器进行求解，并生成详细的
+LaTeX格式报告。该脚本特别关注排版质量和用户体验，提供了智能变量
+格式化功能，确保报告中的变量名按逻辑顺序排列并采用统一的格式。
 """
 import coptpy as cp
 from coptpy import COPT
@@ -22,23 +29,54 @@ from collections import defaultdict
 class MPSCOPTSolver:
     """
     MPS文件COPT求解器，生成完整且页面友好的LaTeX格式报告。
+    
+    这个类是处理MPS格式文件的核心组件，它使用COPT求解器API实现以下功能：
+    1. 读取和解析MPS格式的数学规划模型
+    2. 调用COPT求解器进行模型求解
+    3. 提取求解结果并进行分析
+    4. 生成结构化的LaTeX报告，包含完整的模型信息和解决方案
+    5. 应用智能格式化规则，提高报告的可读性
+    
+    该类特别注重报告质量和用户体验，适合研究人员和专业优化从业者使用。
     """
     def __init__(self, mps_filepath):
+        """
+        初始化MPS文件COPT求解器
+        
+        参数:
+        mps_filepath - MPS文件的路径
+        
+        这个初始化方法设置求解器环境和基本属性，创建COPT环境和模型对象，
+        并检查输入文件是否存在。它还初始化了用于存储求解结果、变量信息和
+        格式化设置的多个数据结构。
+        """
         if not os.path.exists(mps_filepath):
             raise FileNotFoundError(f"错误: 文件 '{mps_filepath}' 不存在。")
         self.mps_filepath = mps_filepath
         # 创建环境和模型
-        self.env = cp.Envr()
-        self.model = self.env.createModel("MPS_Solver")
-        self.solve_status = None
-        self.objective_value = None
-        self.solution = {}
-        self.all_vars_cache = None  # 缓存变量列表
+        self.env = cp.Envr()        # COPT环境对象
+        self.model = self.env.createModel("MPS_Solver")  # COPT模型对象
+        self.solve_status = None    # 求解状态
+        self.objective_value = None # 目标函数值
+        self.solution = {}          # 变量解值字典
+        self.all_vars_cache = None  # 缓存变量列表，避免重复获取
         self.log_filepath = None    # 用于存储日志文件路径
-        self.var_prefix_counts = {}  # 存储每个变量前缀的计数信息
+        self.var_prefix_counts = {} # 存储每个变量前缀的计数信息，用于智能格式化
 
     def _analyze_variable_patterns(self):
-        """分析变量模式，确定每个前缀的变量数量和所需的零填充位数"""
+        """
+        分析变量模式，确定每个前缀的变量数量和所需的零填充位数
+        
+        这个方法扫描模型中的所有变量，识别其命名模式，并确定每种前缀类型
+        (如X, Y等)下的最大数字，从而为每种前缀计算出适合的零填充位数。
+        这是智能变量格式化功能的基础，确保LaTeX报告中的变量名按照一致且
+        有逻辑的方式呈现，提高可读性。
+        
+        例如:
+        - 如果X变量最大为X999，则使用3位填充: X_{001}, X_{002}, ...
+        - 如果Y变量最大为Y99，则使用2位填充: Y_{01}, Y_{02}, ...
+        - 如果Z变量最大为Z9，则使用1位填充: Z_{1}, Z_{2}, ...
+        """
         if self.all_vars_cache is None:
             self.all_vars_cache = sorted(self.model.getVars(), key=lambda v: v.Name)
         
@@ -54,11 +92,11 @@ class MPSCOPTSolver:
         # 确定每个前缀需要的零填充位数
         for prefix, max_num in prefix_max_numbers.items():
             if max_num >= 100:
-                padding = 3  # 001, 002, ..., 999
+                padding = 3  # 001, 002, ..., 999 - 三位数填充
             elif max_num >= 10:
-                padding = 2  # 01, 02, ..., 99
+                padding = 2  # 01, 02, ..., 99 - 两位数填充
             else:
-                padding = 1  # 1, 2, ..., 9
+                padding = 1  # 1, 2, ..., 9 - 无需填充
             
             self.var_prefix_counts[prefix] = {
                 'max_number': max_num,
@@ -348,7 +386,20 @@ class MPSCOPTSolver:
         return latex_solution
 
     def solve_model(self):
-        """求解模型，并以更稳健的方式提取结果"""
+        """
+        求解模型，并以更稳健的方式提取结果
+        
+        这个方法是求解流程的核心，它执行以下步骤：
+        1. 读取MPS文件到COPT模型中
+        2. 分析变量命名模式以便后续格式化
+        3. 设置日志文件以记录求解过程
+        4. 调用COPT求解器求解模型
+        5. 获取求解状态和结果
+        6. 提取所有变量的解值
+        
+        该方法使用了完善的异常处理，确保即使求解过程中出现问题，
+        也能捕获尽可能多的信息并给出明确的状态反馈。
+        """
         try:
             print("开始读取MPS文件...")
             self.model.read(self.mps_filepath)
@@ -396,7 +447,25 @@ class MPSCOPTSolver:
             self.solve_status = None
 
     def extract_to_latex(self, output_filepath=None):
-        """提取模型信息并生成完整的LaTeX格式报告"""
+        """
+        提取模型信息并生成完整的LaTeX格式报告
+        
+        参数:
+        output_filepath - 输出文件路径，如不指定则自动生成
+        
+        返回:
+        生成的报告文件路径
+        
+        这个方法生成完整的LaTeX报告，报告包含以下部分：
+        1. 模型概览：包括变量数量、约束数量、模型类型等基本信息
+        2. 目标函数：详细的目标函数表达式，使用LaTeX数学格式
+        3. 约束条件：所有约束条件的完整列表，按类型分组
+        4. 变量定义：按类型(二元、整数、连续)分组的变量列表
+        5. 求解结果：求解状态、目标函数值和变量取值表格
+        
+        报告采用专业的LaTeX排版，支持自动换行以避免排版问题，
+        使用智能变量格式化和排序，使最终文档更加清晰易读。
+        """
         if self.model.Cols == 0:
             print("模型尚未读取或读取失败，无法生成报告。")
             return None
@@ -490,7 +559,19 @@ class MPSCOPTSolver:
             pass
 
 def find_mps_file(filename_input):
-    """智能查找 MPS 文件 - 支持多个目录"""
+    """
+    智能查找 MPS 文件 - 支持多个目录
+    
+    参数:
+    filename_input - 用户输入的文件名或路径
+    
+    返回:
+    找到的MPS文件完整路径，未找到则返回None
+    
+    这个函数实现了智能文件查找，允许用户提供简化的文件名，
+    函数会在多个可能的目录中尝试定位完整的MPS文件。这大大简化了
+    用户体验，使用户无需记住或输入完整的文件路径。
+    """
     base_name = filename_input.replace('.mps', '')
     possible_paths = [
         filename_input,  # 原始输入路径
@@ -529,7 +610,20 @@ def list_mps_files():
     return sorted(mps_files)
 
 def main():
-    """主函数"""
+    """
+    主函数 - 程序的入口点
+    
+    这个函数实现了完整的用户交互流程:
+    1. 显示程序介绍和可用文件列表
+    2. 处理命令行参数或提供交互式输入界面
+    3. 智能查找指定的MPS文件
+    4. 初始化求解器并执行求解
+    5. 生成LaTeX报告
+    6. 提供生成PDF的指令和功能说明
+    
+    该函数包含完善的错误处理和用户提示，
+    确保各种场景下都能提供清晰的反馈和指导。
+    """
     print("=" * 60)
     print("MPS文件COPT求解器与LaTeX报告生成器 (增强版)")
     print("支持智能变量格式化和排序")

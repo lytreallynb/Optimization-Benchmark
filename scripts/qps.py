@@ -4,6 +4,13 @@
 QPS格式解析器 (简化高效版)
 一键求解，自动生成LaTeX报告
 支持智能变量格式化和排序 (新增功能)
+
+详细中文注释:
+本脚本是一个专门处理QPS格式文件的工具，QPS是MPS格式的扩展，
+可以表示二次规划(QP)和二次约束规划(QCP)问题。脚本提供了高效的
+解析器，可以读取QPS格式文件，通过COPT求解器求解，并生成详细的
+LaTeX报告。脚本的特色是对大规模复杂模型提供简化高效的处理能力，
+同时通过智能变量格式化和排序，提高报告的可读性和专业性。
 """
 
 import os
@@ -17,20 +24,56 @@ from collections import defaultdict
 import re
 
 class QPSParser:
-    """QPS格式解析器"""
+    """
+    QPS格式解析器
+    
+    这个类负责解析QPS格式文件，它可以识别和处理QPS文件中的各个部分：
+    - 变量定义和约束条件
+    - 线性项系数
+    - 右侧常数值
+    - 变量界限
+    - 二次项
+    
+    解析后的数据被组织成适合传递给求解器的结构。与标准MPS解析器相比，
+    这个解析器还能处理二次规划所需的二次项系数矩阵。
+    """
     
     def __init__(self, filepath):
-        self.filepath = filepath
-        self.name = ""
-        self.rows = {}  # row_name -> (sense, rhs)
-        self.cols = {}  # col_name -> {row_name: coeff}
-        self.bounds = {}  # col_name -> (lb, ub)
-        self.quadobj = {}  # (var1, var2) -> coeff
-        self.obj_name = None
-        self.objective_constant = 0.0
+        """
+        初始化QPS解析器
+        
+        参数:
+        filepath - QPS文件路径
+        
+        这个构造方法初始化了解析器需要的所有数据结构，用于存储QPS文件中的各种元素，
+        包括行(约束)、列(变量)、边界条件、二次项系数以及目标函数信息。
+        """
+        self.filepath = filepath       # QPS文件路径
+        self.name = ""                 # 问题名称
+        self.rows = {}                 # 行信息映射: row_name -> (sense, rhs)
+        self.cols = {}                 # 列信息映射: col_name -> {row_name: coeff}
+        self.bounds = {}               # 变量边界: col_name -> (lb, ub)
+        self.quadobj = {}              # 二次项系数: (var1, var2) -> coeff
+        self.obj_name = None           # 目标函数行名称
+        self.objective_constant = 0.0  # 目标函数常数项
         
     def parse(self):
-        """解析QPS文件"""
+        """
+        解析QPS文件
+        
+        这个方法读取并解析QPS格式文件，按照QPS文件的标准结构，依次处理各个段落：
+        - NAME: 模型名称
+        - ROWS: 约束条件类型定义
+        - COLUMNS: 变量及其在各约束中的系数
+        - RHS: 约束条件的右侧常数
+        - BOUNDS: 变量的上下界
+        - QUADOBJ: 目标函数中的二次项
+        - ENDATA: 文件结束标记
+        
+        解析过程采用逐行处理的方式，对每一行内容根据其所在段落
+        调用相应的解析方法。整个过程包含错误处理，确保即使遇到
+        格式问题也能尽可能地完成解析。
+        """
         current_section = None
         
         print("开始解析QPS文件...")

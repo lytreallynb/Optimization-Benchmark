@@ -10,6 +10,12 @@ AMPL模型求解器与LaTeX报告生成器 (增强版)
 - 生成完整的LaTeX格式报告
 - 支持智能变量格式化和排序
 - 自动识别模型结构并生成专业报告
+
+详细中文注释:
+这个脚本是一个用于处理AMPL模型的完整工具。它可以自动读取AMPL格式的数学规划模型，
+调用多种求解器（如Gurobi, CPLEX, COPT等）求解这些模型，并生成详细的LaTeX格式报告。
+该脚本支持智能变量格式化，可以根据变量数量自动调整显示格式，还能自动识别模型结构，
+从而生成结构化的专业报告。适用于研究人员分析和展示优化模型的结果。
 """
 
 import os
@@ -30,25 +36,41 @@ except ImportError:
     print("警告: amplpy未安装。请运行: pip install amplpy")
 
 class AMPLSolver:
-    """AMPL模型求解器，生成完整且页面友好的LaTeX格式报告"""
+    """
+    AMPL模型求解器，生成完整且页面友好的LaTeX格式报告
+    
+    这个类是整个程序的核心，负责处理AMPL模型和数据文件，调用求解器求解问题，
+    并生成格式化的LaTeX报告。它实现了多种求解器的自动检测和选择，智能变量格式化，
+    以及详细的结果分析和可视化。
+    """
     
     def __init__(self, model_filepath, data_filepath=None):
+        """
+        初始化AMPL求解器对象
+        
+        参数:
+        model_filepath - AMPL模型文件(.mod)的路径
+        data_filepath - AMPL数据文件(.dat)的路径，可选
+        
+        这个初始化方法设置了求解器的基本属性，检查必要的库是否可用，并验证输入文件是否存在。
+        它还初始化了存储求解结果、模型信息和格式化设置的多个数据结构。
+        """
         if not AMPL_AVAILABLE:
             raise ImportError("amplpy库未安装，无法使用AMPL求解器")
         
-        self.model_filepath = model_filepath
-        self.data_filepath = data_filepath
-        self.ampl = None
-        self.solve_status = None
-        self.objective_value = None
-        self.solution = {}
-        self.model_info = {}
-        self.constraints_info = {}
-        self.variables_info = {}
-        self.solve_time = 0
-        self.solver_name = "auto"
-        self.log_filepath = None
-        self.var_prefix_counts = {}  # 存储每个变量前缀的计数信息
+        self.model_filepath = model_filepath  # 模型文件路径
+        self.data_filepath = data_filepath    # 数据文件路径
+        self.ampl = None                      # AMPL环境对象
+        self.solve_status = None              # 求解状态
+        self.objective_value = None           # 目标函数值
+        self.solution = {}                    # 变量解值字典
+        self.model_info = {}                  # 模型基本信息
+        self.constraints_info = {}            # 约束信息
+        self.variables_info = {}              # 变量信息
+        self.solve_time = 0                   # 求解时间
+        self.solver_name = "auto"             # 求解器名称，默认为自动选择
+        self.log_filepath = None              # 日志文件路径
+        self.var_prefix_counts = {}           # 存储每个变量前缀的计数信息，用于智能格式化
         
         # 检查文件存在性
         if not os.path.exists(model_filepath):
@@ -56,8 +78,36 @@ class AMPLSolver:
         if data_filepath and not os.path.exists(data_filepath):
             raise FileNotFoundError(f"数据文件不存在: {data_filepath}")
     
+    def _log_message(self, message):
+        """
+        记录消息到日志文件
+        
+        参数:
+        message - 要记录的消息文本
+        
+        这个方法负责将操作和错误信息记录到指定的日志文件中，附加时间戳以便于追踪。
+        它使用异常处理确保即使写入失败也不会中断主程序流程。
+        """
+        if self.log_filepath:
+            try:
+                with open(self.log_filepath, 'a', encoding='utf-8') as log_file:
+                    timestamp = datetime.datetime.now().strftime('%H:%M:%S')
+                    log_file.write(f"[{timestamp}] {message}\n")
+            except Exception as e:
+                print(f"写入日志失败: {e}")
+    
     def _analyze_variable_patterns(self, variables):
-        """分析变量模式，确定每个前缀的变量数量和所需的零填充位数"""
+        """
+        分析变量模式，确定每个前缀的变量数量和所需的零填充位数
+        
+        参数:
+        variables - 变量名列表
+        
+        这个方法分析所有变量名的模式，识别不同前缀(如x、y)的变量，并确定每种前缀下的最大数值，
+        从而决定在LaTeX格式化输出时应使用多少位的零填充。例如，如果x变量超过100个，
+        就会使用三位数格式(x_{001}, x_{002}...)，这样在排序和显示时可以保持正确的顺序。
+        这是本程序智能格式化功能的核心部分。
+        """
         prefix_max_numbers = defaultdict(int)
         
         for var_name in variables:
@@ -76,11 +126,11 @@ class AMPLSolver:
         # 确定每个前缀需要的零填充位数
         for prefix, max_num in prefix_max_numbers.items():
             if max_num >= 100:
-                padding = 3  # 001, 002, ..., 999
+                padding = 3  # 001, 002, ..., 999 - 三位数填充
             elif max_num >= 10:
-                padding = 2  # 01, 02, ..., 99
+                padding = 2  # 01, 02, ..., 99 - 两位数填充
             else:
-                padding = 1  # 1, 2, ..., 9
+                padding = 1  # 1, 2, ..., 9 - 无需填充
             
             self.var_prefix_counts[prefix] = {
                 'max_number': max_num,
@@ -90,7 +140,17 @@ class AMPLSolver:
     def _get_variable_sort_key(self, var_name):
         """
         生成用于排序的键值，确保变量按照前缀和下标正确排序
-        处理 x[1,2], y[10], z[i,j] 等格式
+        
+        参数:
+        var_name - 变量名
+        
+        返回:
+        排序键 - 用于确定变量排序顺序的元组
+        
+        这个方法处理各种复杂的变量命名格式，如 x[1,2], y[10], z[i,j] 等，
+        通过提取变量前缀和数字下标，生成适合排序的键值。这确保了变量在报告中
+        按照逻辑顺序显示，例如 x[1,1], x[1,2], ..., x[2,1] 而不是字典序。
+        这对于多维数组变量的可读性至关重要。
         """
         # 提取变量基名
         base_match = re.match(r"([a-zA-Z_]+)", var_name)
@@ -112,6 +172,16 @@ class AMPLSolver:
     def _get_constraint_sort_key(self, cons_name):
         """
         生成用于约束排序的键值
+        
+        参数:
+        cons_name - 约束名称
+        
+        返回:
+        排序键 - 用于确定约束排序顺序的元组
+        
+        这个方法与变量排序方法类似，专门用于处理约束名称的排序。
+        它确保约束按照有意义的顺序在报告中呈现，如 const1, const2, const10
+        而不是 const1, const10, const2，这对于大型模型的可读性非常重要。
         """
         base_match = re.match(r"([a-zA-Z_]+)", cons_name)
         if base_match:
@@ -126,19 +196,30 @@ class AMPLSolver:
             return (cons_name, (0,))
     
     def _escape_latex(self, text):
-        """转义LaTeX特殊字符"""
+        """
+        转义LaTeX特殊字符
+        
+        参数:
+        text - 需要转义的文本
+        
+        返回:
+        转义后的文本，可安全用于LaTeX文档
+        
+        这个方法处理所有可能在LaTeX中引起解析问题的特殊字符，
+        将它们转换为对应的LaTeX转义序列。这是生成稳定、无错误LaTeX报告的基础。
+        """
         text = str(text)
         replacements = {
-            '\\': r'\textbackslash{}',
-            '_': r'\_',
-            '%': r'\%',
-            '$': r'\$',
-            '&': r'\&',
-            '#': r'\#',
-            '{': r'\{',
-            '}': r'\}',
-            '^': r'\textasciicircum{}',
-            '~': r'\textasciitilde{}'
+            '\\': r'\textbackslash{}',  # 反斜杠
+            '_': r'\_',                 # 下划线(在LaTeX中用于下标)
+            '%': r'\%',                 # 百分号(在LaTeX中用于注释)
+            '$': r'\$',                 # 美元符号(在LaTeX中用于数学模式)
+            '&': r'\&',                 # 与符号(在LaTeX中用于表格列分隔)
+            '#': r'\#',                 # 井号(在LaTeX中用于参数)
+            '{': r'\{',                 # 左花括号(在LaTeX中用于分组)
+            '}': r'\}',                 # 右花括号(在LaTeX中用于分组)
+            '^': r'\textasciicircum{}', # 脱字符(在LaTeX中用于上标)
+            '~': r'\textasciitilde{}'   # 波浪号(在LaTeX中用于不间断空格)
         }
         for char, replacement in replacements.items():
             text = text.replace(char, replacement)
@@ -147,7 +228,22 @@ class AMPLSolver:
     def _parse_variable_name(self, var_name):
         """
         将AMPL变量名转换为LaTeX格式，使用智能零填充
-        例如: x[1,2] -> x_{01,02}, y[10] -> y_{10}
+        
+        参数:
+        var_name - AMPL变量名
+        
+        返回:
+        格式化后的LaTeX变量名表示
+        
+        这个方法是智能变量格式化功能的核心实现，它将AMPL中的变量名(如x[1,2], y[10])
+        转换为格式化的LaTeX表示(如x_{01,02}, y_{10})。对于数字下标，它应用前面
+        分析得出的零填充规则，确保视觉一致性和正确排序。对于符号下标，则保留原样。
+        这对于多维索引的变量特别有用，使得最终报告更加专业和易读。
+        
+        例如:
+        - x[1,2] -> x_{01,02}  (当有超过10个但少于100个x变量时)
+        - y[10] -> y_{10}      (当y变量不需要零填充时)
+        - z[i,j] -> z_{i,j}    (保留符号下标)
         """
         # 提取变量基名
         base_match = re.match(r"([a-zA-Z_]+)", var_name)
@@ -219,11 +315,52 @@ class AMPLSolver:
         参数:
         - solver: 求解器名称 ("gurobi", "cplex", "copt", "auto"等)
         - options: 求解器选项字典
+        
+        返回:
+        布尔值 - 求解是否成功
+        
+        这是本类的核心方法，负责完成求解过程的全部工作流程：
+        1. 初始化AMPL环境并配置许可证
+        2. 设置日志文件和路径
+        3. 读取模型和数据文件
+        4. 提取和分析模型结构信息
+        5. 检测和选择合适的求解器
+        6. 设置求解器选项并启动求解
+        7. 捕获求解结果和状态
+        8. 提取变量解值和目标函数值
+        
+        该方法设计了完善的错误处理和回退策略，确保即使在不理想条件下也能尽可能地完成任务。
+        它还实现了多种方法来解析求解器输出，确保能正确获取结果。
         """
         try:
             print("初始化AMPL环境...")
             self.ampl = AMPL()
             self.solver_name = solver
+            
+            # 配置求解器许可证路径
+            try:
+                license_dir = os.path.abspath("license")
+                if os.path.exists(license_dir):
+                    # 设置 Gurobi 许可证
+                    gurobi_lic = os.path.join(license_dir, "gurobi.lic")
+                    if os.path.exists(gurobi_lic):
+                        os.environ['GRB_LICENSE_FILE'] = gurobi_lic
+                        print(f"设置 Gurobi 许可证: {gurobi_lic}")
+                    
+                    # 设置 COPT 许可证
+                    copt_lic = os.path.join(license_dir, "license.dat")
+                    if os.path.exists(copt_lic):
+                        os.environ['COPT_LICENSE_FILE'] = copt_lic
+                        print(f"设置 COPT 许可证: {copt_lic}")
+                    
+                    # 备用 COPT 许可证文件
+                    copt_key = os.path.join(license_dir, "license.key")
+                    if os.path.exists(copt_key):
+                        os.environ['COPT_LICENSE_KEY'] = copt_key
+                        print(f"设置 COPT 许可证密钥: {copt_key}")
+                        
+            except Exception as e:
+                print(f"配置许可证时出错: {e}")
             
             # 设置日志文件
             log_dir = "ampl_logs"
@@ -240,31 +377,52 @@ class AMPLSolver:
             
             self.log_filepath = os.path.join(log_dir, log_name)
             
+            # 初始化日志文件 (使用英文以避免编码问题)
+            try:
+                with open(self.log_filepath, 'w', encoding='utf-8') as log_file:
+                    log_file.write(f"AMPL Solving Log - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    log_file.write(f"Model File: {self.model_filepath}\n")
+                    if self.data_filepath:
+                        log_file.write(f"Data File: {self.data_filepath}\n")
+                    log_file.write(f"Solver: {solver}\n")
+                    log_file.write("=" * 60 + "\n\n")
+                print(f"日志将保存到: {self.log_filepath}")
+            except Exception as e:
+                print(f"创建日志文件时出错: {e}")
+            
             print(f"读取模型文件: {self.model_filepath}")
+            self._log_message(f"Reading model file: {self.model_filepath}")
             self.ampl.read(self.model_filepath)
+            self._log_message("Model file loaded successfully")
             
             # 如果有数据文件，读取数据
             if self.data_filepath:
                 print(f"读取数据文件: {self.data_filepath}")
+                self._log_message(f"Reading data file: {self.data_filepath}")
                 self.ampl.readData(self.data_filepath)
+                self._log_message("Data file loaded successfully")
             
             # 提取模型信息
+            self._log_message("Starting model information extraction")
             self._extract_model_info()
+            self._log_message(f"Model info extracted - Variables: {len(self.variables_info)}, Constraints: {len(self.constraints_info)}")
             
             # 分析变量模式
             variables = list(self.variables_info.keys())
             print("分析变量命名模式...")
+            self._log_message("Analyzing variable naming patterns")
             self._analyze_variable_patterns(variables)
             
             # 检测可用求解器
             available_solvers = self._detect_available_solvers()
             print(f"检测到可用求解器: {available_solvers if available_solvers else '无'}")
+            self._log_message(f"Available solvers detected: {available_solvers}")
             
             # 设置求解器
             if solver == "auto":
                 if available_solvers:
-                    # 按优先级选择求解器
-                    priority_solvers = ['gurobi', 'cplex', 'copt', 'highs', 'cbc']
+                    # 按优先级选择求解器 - 优先使用商业求解器（现在有许可证了）
+                    priority_solvers = ['gurobi', 'copt', 'cplex', 'highs', 'cbc']
                     chosen_solver = None
                     for pref_solver in priority_solvers:
                         if pref_solver in available_solvers:
@@ -275,14 +433,17 @@ class AMPLSolver:
                         self.ampl.setOption('solver', chosen_solver)
                         self.solver_name = chosen_solver
                         print(f"自动选择求解器: {chosen_solver}")
+                        self._log_message(f"Auto-selected solver: {chosen_solver}")
                     else:
                         # 使用第一个可用的求解器
                         chosen_solver = available_solvers[0]
                         self.ampl.setOption('solver', chosen_solver)
                         self.solver_name = chosen_solver
                         print(f"使用可用求解器: {chosen_solver}")
+                        self._log_message(f"Using available solver: {chosen_solver}")
                 else:
                     print("错误: 未检测到任何可用的求解器!")
+                    self._log_message("Error: No available solvers detected!")
                     print("\n解决方案:")
                     print("1. 安装求解器 (如 Gurobi, CPLEX, COPT, HiGHS)")
                     print("2. 确保求解器在 AMPL 中正确配置")
@@ -316,22 +477,73 @@ class AMPLSolver:
                 for option, value in options.items():
                     self.ampl.setOption(option, value)
                     print(f"设置选项: {option} = {value}")
+                    self._log_message(f"设置求解器选项: {option} = {value}")
             
             # 记录求解时间
             import time
             start_time = time.time()
             
             print("开始求解模型...")
-            self.ampl.solve()
+            self._log_message(f"Starting model solving with solver: {self.solver_name}")
+            
+            # 捕获求解器输出以解析目标函数值
+            import io
+            import contextlib
+            
+            # 创建一个StringIO对象来捕获输出
+            solver_output = io.StringIO()
+            
+            # 使用contextlib重定向标准输出
+            with contextlib.redirect_stdout(solver_output):
+                self.ampl.solve()
+            
+            # 获取求解器输出
+            output_text = solver_output.getvalue()
+            print(output_text)  # 仍然打印到控制台
+            self._log_message(f"Solver output: {output_text.strip()}")
+            
+            # 尝试从求解器输出中解析真实的目标函数值
+            real_objective_value = None
+            try:
+                # 解析Gurobi输出: "optimal solution; objective -464.7531429"
+                import re
+                gurobi_match = re.search(r'optimal solution;\s*objective\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)', output_text)
+                if gurobi_match:
+                    real_objective_value = float(gurobi_match.group(1))
+                    print(f"从Gurobi输出解析得到目标函数值: {real_objective_value}")
+                    self._log_message(f"Parsed objective value from Gurobi output: {real_objective_value}")
+                
+                # 解析COPT输出: "optimal solution; objective -464.7531429"
+                if not real_objective_value:
+                    copt_match = re.search(r'optimal solution;\s*objective\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)', output_text)
+                    if copt_match:
+                        real_objective_value = float(copt_match.group(1))
+                        print(f"从COPT输出解析得到目标函数值: {real_objective_value}")
+                        self._log_message(f"Parsed objective value from COPT output: {real_objective_value}")
+                
+                # 解析HiGHS输出: "optimal solution; objective -464.7531429"
+                if not real_objective_value:
+                    highs_match = re.search(r'optimal solution;\s*objective\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)', output_text)
+                    if highs_match:
+                        real_objective_value = float(highs_match.group(1))
+                        print(f"从HiGHS输出解析得到目标函数值: {real_objective_value}")
+                        self._log_message(f"Parsed objective value from HiGHS output: {real_objective_value}")
+                        
+            except Exception as e:
+                print(f"解析求解器输出时出错: {e}")
+                self._log_message(f"Error parsing solver output: {e}")
             
             self.solve_time = time.time() - start_time
+            self._log_message(f"Solving completed, time elapsed: {self.solve_time:.3f} seconds")
             
             # 获取求解状态
             try:
                 solve_result = self.ampl.getValue("solve_result")
                 solve_result_num = self.ampl.getValue("solve_result_num")
+                self._log_message(f"Solve status: {solve_result} (code: {solve_result_num})")
             except Exception as e:
                 print(f"获取求解状态时出错: {e}")
+                self._log_message(f"Error getting solve status: {e}")
                 solve_result = "unknown"
                 solve_result_num = -1
             
@@ -341,25 +553,92 @@ class AMPLSolver:
             # 提取解
             if solve_result in ["solved", "optimal"]:
                 self.solve_status = "optimal"
+                self._log_message("Solving successful, starting solution extraction")
                 
                 # 获取目标函数值
-                try:
-                    self.objective_value = self.ampl.getValue("_objective")
-                    print(f"目标函数值 (_objective): {self.objective_value}")
-                except Exception as e1:
-                    print(f"获取 _objective 失败: {e1}")
+                # 优先使用从求解器输出解析的值
+                if real_objective_value is not None:
+                    self.objective_value = real_objective_value
+                    print(f"使用解析的目标函数值: {self.objective_value}")
+                    self._log_message(f"Using parsed objective value: {self.objective_value}")
+                else:
+                    # 回退到API方法
                     try:
-                        # 尝试其他方式获取目标值
-                        objectives = self.ampl.getObjectives()
-                        if objectives:
-                            obj_name, obj = next(iter(objectives))
-                            self.objective_value = obj.value()
-                            print(f"目标函数值 ({obj_name}): {self.objective_value}")
-                        else:
-                            print("没有找到目标函数")
-                    except Exception as e2:
-                        print(f"获取目标函数值失败: {e2}")
-                        self.objective_value = None
+                        self.objective_value = self.ampl.getValue("_objective")
+                        print(f"目标函数值 (_objective): {self.objective_value}")
+                        self._log_message(f"目标函数值: {self.objective_value}")
+                    except Exception as e1:
+                        print(f"获取 _objective 失败: {e1}")
+                        self._log_message(f"Failed to get _objective: {e1}")
+                        try:
+                            # 尝试其他方式获取目标值
+                            objectives = self.ampl.getObjectives()
+                            if objectives:
+                                obj_name, obj = next(iter(objectives))
+                                
+                                # 检查目标函数是否是索引化的
+                                if obj.numInstances() > 1:
+                                    print(f"发现索引化目标函数 {obj_name}，实例数: {obj.numInstances()}")
+                                    self._log_message(f"发现索引化目标函数 {obj_name}，实例数: {obj.numInstances()}")
+                                    
+                                    # 尝试获取第一个实例的值
+                                    try:
+                                        obj_df = obj.getValues()
+                                        if hasattr(obj_df, 'toDict'):
+                                            obj_dict = obj_df.toDict()
+                                            if obj_dict:
+                                                first_key = next(iter(obj_dict))
+                                                self.objective_value = obj_dict[first_key]
+                                                print(f"目标函数值 ({obj_name}[{first_key}]): {self.objective_value}")
+                                                self._log_message(f"目标函数值 ({obj_name}[{first_key}]): {self.objective_value}")
+                                            else:
+                                                print(f"目标函数 {obj_name} 的字典为空")
+                                                self._log_message(f"目标函数 {obj_name} 的字典为空")
+                                                self.objective_value = None
+                                        else:
+                                            # 尝试直接从DataFrame获取第一行
+                                            try:
+                                                for row in obj_df:
+                                                    if hasattr(row, '__len__') and len(row) >= 2:
+                                                        key = row[0]
+                                                        value = row[1]
+                                                        self.objective_value = float(value)
+                                                        print(f"目标函数值 ({obj_name}[{key}]): {self.objective_value}")
+                                                        self._log_message(f"目标函数值 ({obj_name}[{key}]): {self.objective_value}")
+                                                        break
+                                                else:
+                                                    self.objective_value = None
+                                                    print(f"无法从DataFrame提取目标函数值")
+                                                    self._log_message(f"无法从DataFrame提取目标函数值")
+                                            except Exception as e3:
+                                                print(f"从DataFrame提取目标函数值失败: {e3}")
+                                                self._log_message(f"从DataFrame提取目标函数值失败: {e3}")
+                                                self.objective_value = None
+                                    except Exception as e3:
+                                        print(f"获取索引化目标函数值失败: {e3}")
+                                        self._log_message(f"获取索引化目标函数值失败: {e3}")
+                                        self.objective_value = None
+                                else:
+                                    # 单个目标函数实例
+                                    api_value = obj.value()
+                                    print(f"API目标函数值 ({obj_name}): {api_value}")
+                                    self._log_message(f"API目标函数值 ({obj_name}): {api_value}")
+                                    
+                                    # 如果API值看起来不合理（接近零），则设为None
+                                    if abs(api_value) < 1e-100:
+                                        print(f"API目标函数值太小，可能不正确")
+                                        self._log_message(f"API目标函数值太小，可能不正确")
+                                        self.objective_value = None
+                                    else:
+                                        self.objective_value = api_value
+                            else:
+                                print("没有找到目标函数")
+                                self._log_message("没有找到目标函数")
+                                self.objective_value = None
+                        except Exception as e2:
+                            print(f"获取目标函数值失败: {e2}")
+                            self._log_message(f"获取目标函数值失败: {e2}")
+                            self.objective_value = None
                 
                 # 检查求解状态
                 try:
@@ -570,12 +849,15 @@ class AMPLSolver:
             else:
                 self.solve_status = solve_result
                 print(f"求解失败: {solve_result}")
+                self._log_message(f"求解失败: {solve_result}")
                 return False
                 
         except Exception as e:
             print(f"求解过程发生错误: {e}")
+            self._log_message(f"求解过程发生错误: {e}")
             import traceback
             traceback.print_exc()
+            self._log_message(f"错误堆栈: {traceback.format_exc()}")
             return False
     
     def _extract_model_info(self):
@@ -749,7 +1031,25 @@ class AMPLSolver:
         return analysis
     
     def generate_latex_report(self, output_filepath=None):
-        """生成LaTeX报告"""
+        """
+        生成LaTeX报告
+        
+        参数:
+        output_filepath - 输出文件路径，如不指定则自动生成
+        
+        返回:
+        生成的报告文件路径
+        
+        这个方法将求解结果和模型信息整合为格式化的LaTeX报告。报告包含：
+        1. 基本问题信息和文件源
+        2. 模型摘要和统计信息
+        3. 求解状态和结果分析
+        4. 变量值表格(使用智能格式化)
+        5. 原始模型代码摘要
+        
+        报告采用专业的排版和格式，支持中文，可直接编译为PDF。
+        报告的设计考虑了学术研究和专业展示的需求，包含丰富的元信息和格式化说明。
+        """
         if output_filepath is None:
             tex_reports_dir = "ampl_reports"
             os.makedirs(tex_reports_dir, exist_ok=True)
@@ -995,33 +1295,62 @@ class AMPLSolver:
         except Exception:
             pass
 
-def find_ampl_files(filename_input):
-    """智能查找AMPL文件"""
-    base_name = filename_input.replace('.mod', '').replace('.dat', '')
+def find_ampl_files(model_input, data_input=None):
+    """
+    智能查找AMPL文件
+    
+    参数:
+    model_input - 模型文件名或路径
+    data_input - 可选的数据文件名或路径
+    
+    返回:
+    (mod_file, dat_file) - 找到的模型文件和数据文件路径
+    
+    这个函数实现了智能文件查找功能，可以根据用户提供的简略名称，
+    在多个可能的目录中定位AMPL模型文件(.mod)和数据文件(.dat)。
+    它考虑了多种可能的文件命名和目录结构情况，使用户可以用简单的
+    命令行参数就能找到正确的文件，而不需要提供完整路径。
+    """
+    # 处理模型文件
+    model_base_name = model_input.replace('.mod', '').replace('.dat', '')
     
     # 如果用户输入了.dat文件，提取基名并查找对应的.mod文件
-    if filename_input.endswith('.dat'):
-        print(f"检测到数据文件输入: {filename_input}")
-        print(f"尝试查找对应的模型文件: {base_name}.mod")
+    if model_input.endswith('.dat'):
+        print(f"检测到数据文件输入: {model_input}")
+        print(f"尝试查找对应的模型文件: {model_base_name}.mod")
     
-    # 可能的文件路径
+    # 可能的模型文件路径
     possible_mod_paths = [
-        filename_input if filename_input.endswith('.mod') else f"{filename_input}.mod",
-        f"{base_name}.mod",
-        os.path.join("ampl", f"{base_name}.mod"),
-        os.path.join("models", f"{base_name}.mod"),
-        os.path.join("ampl", filename_input) if filename_input.endswith('.mod') else None,
-        os.path.join("models", filename_input) if filename_input.endswith('.mod') else None,
+        model_input if model_input.endswith('.mod') else f"{model_input}.mod",
+        f"{model_base_name}.mod",
+        os.path.join("ampl", f"{model_base_name}.mod"),
+        os.path.join("models", f"{model_base_name}.mod"),
+        os.path.join("ampl", model_input) if model_input.endswith('.mod') else None,
+        os.path.join("models", model_input) if model_input.endswith('.mod') else None,
     ]
     
-    possible_dat_paths = [
-        filename_input if filename_input.endswith('.dat') else f"{filename_input}.dat",
-        f"{base_name}.dat",
-        os.path.join("ampl", f"{base_name}.dat"),
-        os.path.join("models", f"{base_name}.dat"),
-        os.path.join("data", f"{base_name}.dat"),
-        os.path.join("ampl", filename_input) if filename_input.endswith('.dat') else None,
-    ]
+    # 处理数据文件
+    if data_input:
+        # 如果指定了数据文件参数，优先查找该文件
+        data_base_name = data_input.replace('.dat', '')
+        possible_dat_paths = [
+            data_input if data_input.endswith('.dat') else f"{data_input}.dat",
+            f"{data_base_name}.dat",
+            os.path.join("ampl", f"{data_base_name}.dat"),
+            os.path.join("models", f"{data_base_name}.dat"),
+            os.path.join("data", f"{data_base_name}.dat"),
+            os.path.join("ampl", data_input) if data_input.endswith('.dat') else None,
+        ]
+    else:
+        # 如果没有指定数据文件，查找与模型文件同名的数据文件
+        possible_dat_paths = [
+            model_input if model_input.endswith('.dat') else f"{model_input}.dat",
+            f"{model_base_name}.dat",
+            os.path.join("ampl", f"{model_base_name}.dat"),
+            os.path.join("models", f"{model_base_name}.dat"),
+            os.path.join("data", f"{model_base_name}.dat"),
+            os.path.join("ampl", model_input) if model_input.endswith('.dat') else None,
+        ]
     
     mod_file = None
     dat_file = None
@@ -1049,7 +1378,16 @@ def find_ampl_files(filename_input):
     return mod_file, dat_file
 
 def list_ampl_files():
-    """列出可用的AMPL文件"""
+    """
+    列出可用的AMPL文件
+    
+    返回:
+    (mod_files, dat_files) - 找到的模型文件列表和数据文件列表
+    
+    这个函数扫描多个常见目录，查找所有可用的AMPL模型文件(.mod)和数据文件(.dat)，
+    帮助用户了解有哪些文件可供使用。这在用户不确定系统中有哪些模型可用时特别有用。
+    结果按字母顺序排序，方便查找。
+    """
     mod_files = []
     dat_files = []
     search_dirs = [".", "ampl", "models", "data"]
@@ -1068,7 +1406,21 @@ def list_ampl_files():
     return sorted(mod_files), sorted(dat_files)
 
 def main():
-    """主函数"""
+    """
+    主函数 - 程序的入口点
+    
+    这个函数实现了完整的用户交互流程，包括：
+    1. 显示程序介绍和使用说明
+    2. 检查命令行参数或提供交互式选择界面
+    3. 智能查找所需的文件
+    4. 选择适当的求解器
+    5. 初始化求解器对象并执行求解
+    6. 生成LaTeX报告
+    7. 提供后续步骤的指导(如生成PDF的命令)
+    
+    整个过程设计了完善的错误处理和用户友好的提示，
+    即使对于不熟悉AMPL或命令行的用户也能轻松操作。
+    """
     print("=" * 60)
     print("AMPL模型求解器与LaTeX报告生成器 (增强版)")
     print("支持智能变量格式化和排序")
@@ -1153,7 +1505,8 @@ def main():
                     specific_data_file = second_arg.split('=', 1)[1]
                 elif second_arg == '--data' and len(sys.argv) > 3:
                     specific_data_file = sys.argv[3]
-                elif second_arg.endswith('.dat') or os.path.exists(second_arg):
+                else:
+                    # 将第二个参数视为数据文件名（不要求文件必须存在）
                     specific_data_file = second_arg
                     print(f"检测到数据文件参数: {specific_data_file}")
             
@@ -1232,14 +1585,23 @@ def main():
         
         # 查找文件
         if specific_data_file:
-            # 如果指定了数据文件，直接使用
-            mod_file, _ = find_ampl_files(filename_input)
-            if os.path.exists(specific_data_file):
-                dat_file = specific_data_file
-                print(f"使用指定的数据文件: {specific_data_file}")
+            # 如果指定了数据文件，使用新的查找函数
+            mod_file, dat_file = find_ampl_files(filename_input, specific_data_file)
+            if dat_file:
+                print(f"使用指定的数据文件: {dat_file}")
             else:
                 print(f"指定的数据文件不存在: {specific_data_file}")
-                dat_file = None
+                print("尝试查找的路径:")
+                data_base_name = specific_data_file.replace('.dat', '')
+                possible_dat_paths = [
+                    specific_data_file if specific_data_file.endswith('.dat') else f"{specific_data_file}.dat",
+                    f"{data_base_name}.dat",
+                    os.path.join("ampl", f"{data_base_name}.dat"),
+                    os.path.join("models", f"{data_base_name}.dat"),
+                    os.path.join("data", f"{data_base_name}.dat"),
+                ]
+                for path in possible_dat_paths:
+                    print(f"  - {path}")
         else:
             mod_file, dat_file = find_ampl_files(filename_input)
         
